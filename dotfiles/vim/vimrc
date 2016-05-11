@@ -1,0 +1,1086 @@
+" Author ------------------------------------------------------------------- {{{
+
+" Hamilton Little: hamilton.little@gmail.com
+" Github Username: HamboLagos
+
+" }}}
+" Preamble ----------------------------------------------------------------- {{{
+"   Note on Operators ------------------------------------------------------ {{{
+" nmap: normal           | map (NVO mode)
+" vmap: visual + select  | map (NVO mode)
+" omap: operator pending | map (NVO mode)
+" imap: insert           | map! (IC mode)
+" cmap: command line     | map! (IC mode)
+"   }}}
+"   Vundle Plugins --------------------------------------------------------- {{{
+
+" Required before adding plugins
+set nocompatible
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+
+call vundle#begin()
+
+" Required for vundle bootstrap
+Plugin 'VundleVim/Vundle.vim'
+
+" NerdTree file browser
+Plugin 'scrooloose/nerdtree'
+
+" ControlP fuzzy file finder
+Plugin 'ctrlpvim/ctrlp.vim'
+
+call vundle#end()
+
+" Required after adding plugins
+filetype plugin indent on
+syntax on
+"   }}}
+"   Miscellany ------------------------------------------------------------- {{{
+
+" Use bash as the standard shell
+set shell=/bin/bash
+
+" Uncomment to control colorscheme manually, otherwise it falls to the shell
+" set background=dark
+" colorscheme solarized
+
+" Everybody follow the leader
+let mapleader = ","
+let maplocalleader = "\\"
+
+" Leave insert with an easy mapping
+inoremap kj <esc>
+
+" Enable the alt meta key in terminal vim
+" set the timeout for escaped meta keys in ms
+if !has("gui_running")
+    let c='a'
+    while c <= 'z'
+        exec "set <A-".c.">=\e".c
+        exec "imap \e".c." <A-".c.">"
+        let c = nr2char(1+char2nr(c))
+    endw
+
+    let c='A'
+    while c <= 'Z'
+        exec "set <A-".c.">=\e".c
+        exec "imap \e".c." <A-".c.">"
+        let c = nr2char(1+char2nr(c))
+    endw
+endif
+
+" dt between <esc> and <char> to interpret as <A-char>, vs <esc><char>
+set timeout ttimeoutlen=25
+
+"   }}}
+" }}}
+" Vim Settings ------------------------------------------------------------- {{{
+"   Uncategorized ---------------------------------------------------------- {{{
+
+set autoindent                 "use indentation of previous line
+set showcmd                    "show the last ex command
+set laststatus=2               "Always display the statusline in all windows
+set hidden                     "hide buffers, don't abandon them
+set visualbell t_vb=           "turn off visual and sound bell
+set ttyfast                    "improve screen redrawing
+set undofile                   "save undo history to file
+set lazyredraw                 "save some computational power
+set splitbelow                 "default split behavior
+set splitright                 "default split behavior
+set autoread                   "reread files that changed outside vim
+set autowrite                  "auto save when moving away via ^], fe
+set autowriteall               "same, but for :edit and family
+set title                      "use a title
+set ignorecase smartcase       "use smart case searching
+set cursorline                 "highlight the current line
+set whichwrap=                 "no keys can wrap lines in normal/visual
+set hlsearch incsearch         "highlight as we go
+set history=1000               "keep a longer ex history
+set undoreload=1000            "keep a longer undo history
+set backspace=indent,eol,start "let insert mode backspace be useful
+set colorcolumn=+1             "highilight the column after the textwidth value
+set nrformats=octal,hex,alpha  "make ^x and ^a intelligent
+set scrolloff=10               "keep at least 10 lines above/below cursor
+set virtualedit=block          "Let block visual go past EOL
+set list                       "show special chars (below)
+set foldmethod=syntax          "use syntax folding by default
+set number                     "enable line numbers by default
+set listchars=tab:>-,trail:^
+set encoding=utf-8
+
+"   }}}
+"   Text Formatting -------------------------------------------------------- {{{
+
+" Formatting Options - When to format text and automatic line wrapping
+" We can try formatting anything with 'normal! gq'
+" Code is never formatted for us, comments are automatically wrapped at tw
+" opening a new line from a comment leaves us in the comment
+" apply special rules for lists (alpha lists not supported, fe. a) or B.)
+set formatoptions=
+set formatoptions-=t " Don't wrap code automatically (trigger: 'normal! gq')
+set formatoptions+=c " Wrap comments to textwidth, insert comment leader
+set formatoptions+=r " <Enter> continues comment on next line
+set formatoptions+=o " 'normal! o' and 'normal! O' continue a comment
+set formatoptions+=q " 'normal! gq' can format comments
+set formatoptions-=w " Paragraphs are separated by a blink line, not trailing ws
+set formatoptions-=a " don't reformat paragraphs as they're typed
+set formatoptions+=n " Recognize numbered lists
+set formatoptions-=2 " Can't use because we have +n
+set formatoptions-=v " Always break lines that exceed textwidth
+set formatoptions-=b " Always break lines that exceed textwidth
+set formatoptions-=l " Always break lines that exceed textwidth
+set formatoptions-=m " We don't use asian characters
+set formatoptions-=M " We don't use multi-byte characters
+set formatoptions-=B " We don't use multi-byte characters
+set formatoptions+=1 " Prefer breaking a line before a 1 letter word
+set formatoptions+=j " remove comment leader when joining lines
+
+" Regex to recognize lists, and apply better formatting
+"   one or more <digit>,-,*,+ followed by one ],:,.,),},<tab>,<space>
+set formatlistpat=\\v^\\s*(\\d+\|\\-+\|\\*+\|\\++)[\\]:.)}\\t\ ]\\s*
+
+function! SetCInOptions() " {{{
+    " clear all options, and set the ones we care about
+    set cinoptions=
+    set cinoptions+=>s  " normal indent increase == 1s
+    " set cinoptions=e  " no extra indent if preceding brace doesn't start line
+    " set cinoptions=n  " no extra indent in unscoped conditional
+    " set cinoptions=f  " no extra indent for first opening brace in a block
+    " set cinoptions={  " no extra indent for opening braces
+    " set cinoptions=}  " no extra indent for closing braces
+    " set cinoptions=^  " no extra indent for outermost block
+    set cinoptions+=L0  " keep jump statements at the same indent as surroundings
+    set cinoptions+=:0  " keep case label indentation with switch() statement
+    " set cinoptions==  " no extra indent for statements following ^^^
+    set cinoptions+=l1  " align to case label as if it were a {
+    " set cinoptions=b  " align break statement with surrounding inner block
+    set cinoptions+=g0  " (public:|private:|protected:) indent to class statement
+    " set cinoptions=h  " no extra indent for statements following ^^^
+    set cinoptions+=N-s " remove indent following a namespace declaration
+    " set cinoptions=p  " unused, K&R style function declaration indentation
+    set cinoptions+=t0  " keep function return type at normal indentation
+    " set cinoptions=i  " use 1s for member initialization lists
+    " set cinoptions=+  " use 1s for continuation lines
+    " set cinoptions=c  " indent 3 spaces for comments missing the prepending char
+    " set cinoptions=C  " same as ^^^, but when preceeded by other text
+    " set cinoptions=/  " no extra indent for bare comment lines
+    set cinoptions+=(0  " unclosed parenthesis is used as the new indentation level
+    set cinoptions+=u0  " same as ^^^, but for one more level
+    set cinoptions+=U0  " don't indent extra when a paren is on a line by itself
+    "set cinoptions=w   " use first non-white character in an unclosed paren
+    set cinoptions+=Ws  " if the first argument is too long, wrap it 1s
+    set cinoptions+=ks  " unclosed parens for if, while, etc. get extra indent
+    " set cinoptions=m  " use indentation of opening paren for closing paren
+    " set cinoptions=M  " use indentation of opening paren for closing paren
+    set cinoptions+=j1  " better java and javascript indentation rules
+    set cinoptions+=J1  " better java and javascript indentation rules
+    " set cinoptions=)  " unclosed parens can be at most 20 lines away
+    " set cinoptions=*  " unclosed comments can be at most 70 lines away
+    " set cinoptions=#  " diallow right shifting lines that start with #
+
+    " fill in missing options from defaults
+    let l:default_options = [ ">s" , "e0" , "n0" , "f0" , "{0" , "}0" , "^0" ,
+                            \ "L-1", ":s" , "=s" , "l0" , "b0" , "gs" , "hs" ,
+                            \ "N0" , "ps" , "ts" , "is" , "+s" , "c3" , "C0" ,
+                            \ "/0" , "(2s", "us" , "U0" , "w0" , "W0" , "k0" ,
+                            \ "m0" , "j0" , "J0" , ")20", "*70", "#0"         ]
+
+    for l:opt in l:default_options
+        " If the first char in opt does not exist in &cinoptions, its missing
+        " Case sensitivity is required here as well
+        if match(&cinoptions, strcharpart(l:opt, 0, 1)."\C") == -1
+            let &cinoptions.=",".l:opt
+        endif
+    endfor
+endfunction " }}}
+
+" Enable cindent, and set the rules for indentation evaluation
+set cindent
+call SetCInOptions()
+
+" only use 1 space after a punctuation mark {.?!}
+set nojoinspaces
+
+"   }}}
+"   WildMenu --------------------------------------------------------------- {{{
+" TODO Don't know if this works with and/or against YCM...
+set wildmenu
+
+" How to list matches, unsure of the best setting
+set wildmode=list:longest
+
+"Ignore the following files (nerdtree, command-t, etc.)
+set wildignore+=*.aux,*.out,*.toc                "LaTeX intermediate files
+set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg   "binary images
+set wildignore+=*.o,*.obj,*.exe,*.dll,*.manifest "compiled object files
+set wildignore+=*.d,*.su                         "dependency files
+set wildignore+=*.spl                            "compiled spelling word lists
+set wildignore+=*.sw?                            "Vim swap files
+set wildignore+=*~                               "Unix temp files
+
+"   }}}
+"   Tabs, spaces, wrapping ------------------------------------------------- {{{
+
+" Some of these are overridden by the file-specific augroups
+set tabstop=4
+set shiftwidth=4
+set shiftround
+set softtabstop=4
+set expandtab
+set nowrap
+set textwidth=80
+
+"   }}}
+"   Backups ---------------------------------------------------------------- {{{
+
+set backup                        " enable backups
+set undodir=~/.vim/tmp/undo//     " undo files
+set backupdir=~/.vim/tmp/backup// " backups
+set directory=~/.vim/tmp/swap//   " swap files
+
+" Make those folders automatically if they don't already exist.
+if !isdirectory(expand(&undodir))
+    call mkdir(expand(&undodir), "p")
+endif
+if !isdirectory(expand(&backupdir))
+    call mkdir(expand(&backupdir), "p")
+endif
+if !isdirectory(expand(&directory))
+    call mkdir(expand(&directory), "p")
+endif
+
+"   }}}
+" }}}
+" Mappings ----------------------------------------------------------------- {{{
+"   VIMRC Editing ---------------------------------------------------------- {{{
+
+" make the vimrc file easy to edit and source
+" ev open in split window, EV opens in new tab
+nnoremap <silent> <leader>vs :vsplit $MYVIMRC<cr>
+nnoremap <silent> <leader>vt :tabnew $MYVIMRC<cr>
+nnoremap <silent> <leader>ve :edit $MYVIMRC<cr>
+nnoremap <silent> <leader>vv :write $MYVIMRC<cr>:source $MYVIMRC<cr>
+
+"   }}}
+"   Visual Selections ------------------------------------------------------ {{{
+
+" Visual select the last pasted text
+nnoremap <silent> gp `[v`]
+
+"   }}}
+"   Highlighting Controls -------------------------------------------------- {{{
+
+" reset highlighting from a search or otherwise
+nnoremap <silent> <leader>h :nohl<cr>
+
+"   }}}
+"   Typos ------------------------------------------------------------------ {{{
+
+" plain text
+abbrev hte the
+abbrev teh the
+
+abbrev malv mavl
+abbrev MALV MAVL
+abbrev Malv Mavl
+
+" ex commands
+if has("user_commands")
+    command! -bang -nargs=? -complete=file E e<bang> <args>
+    command! -bang -nargs=? -complete=file W w<bang> <args>
+    command! -bang -nargs=? -complete=file Wq wq<bang> <args>
+    command! -bang -nargs=? -complete=file WQ wq<bang> <args>
+    command! -bang Wa wa<bang>
+    command! -bang WA wa<bang>
+    command! -bang Q q<bang>
+    command! -bang QA qa<bang>
+    command! -bang Qa qa<bang>
+endif
+
+"   }}}
+"   Searching and Substitutions -------------------------------------------- {{{
+
+" use the very-magic switch by default in searches
+nnoremap / /\v
+
+" Make substitution regexes more quickly
+" wsb yanks the visual selection, and wraps it in word-delimiters
+" sb is like wsb, but without word delimiters
+" sb in normal mode brings up a blank substitution pattern
+vnoremap <leader>wsb y:%s:\v(<<C-r>0>)::gc<left><left><left>
+vnoremap <leader>sb  y:%s:\v(<C-r>0)::gc<left><left><left>
+nnoremap <leader>sb  :%s:\v::gc<left><left><left><left>
+
+"   }}}
+"   Linewise manipulation -------------------------------------------------- {{{
+
+" H goes to beginning of line
+" gH goes to the first char
+" L goes to end of line
+noremap H 0
+noremap gH ^
+noremap L $
+
+" <S-k> breaks the line (opposite of <S-j>)
+nnoremap <S-k> i<cr><esc>
+
+" <A-h> and <A-l> move the line or selection up or down
+nnoremap <A-l> :m .+1<CR>==
+nnoremap <A-h> :m .-2<CR>==
+vnoremap <A-l> :m '>+1<CR>gv=gv
+vnoremap <A-h> :m '<-2<CR>gv=gv
+
+" <A-j> and <A-k> add an empty line above or below the current
+nnoremap <silent><A-j> :set paste<CR>m`o<Esc>``:set nopaste<CR>
+nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
+
+"   }}}
+"   Insert/Command Mode Movement-------------------------------------------- {{{
+
+" use <A-{h|j|k|l}> for movement in ci mode
+noremap! <A-h> <left>
+noremap! <A-l> <right>
+noremap! <A-j> <down>
+noremap! <A-k> <up>
+
+"   }}}
+"   Auto-Close Members ----------------------------------------------------- {{{
+
+" We're about to clobber the C/C++ derefence-access operator (->),
+" So we preserve its meaning here
+noremap! -> ->
+
+" For each of the following, these rules apply (in insert or command mode):
+" Applies to:
+"   1. { }
+"   2. ( )
+"   3. [ ]
+"   4. < >
+" Rules:
+"   1. <open> makes an empty <open><close>, and puts the cursor inside
+"   2. <close> makes an empty <open><close>, and puts the cursor outside
+"   3. <close><close> and <open><open> prints <open> or <close> once
+"   4. <open><BS> and <close><BS> do nothing
+" Rule 1:
+noremap! { {}<left>
+noremap! ( ()<left>
+noremap! [ []<left>
+noremap! < <><left>
+" Rule 2:
+noremap! } {}
+noremap! ) ()
+noremap! ] []
+noremap! > <>
+" Rule 3:
+noremap! {{ {
+noremap! (( (
+noremap! [[ [
+noremap! << <
+
+noremap! }} }
+noremap! )) )
+noremap! ]] ]
+noremap! >> >
+" Rule 4:
+noremap! {<BS> <Nop>
+noremap! (<BS> <Nop>
+noremap! [<BS> <Nop>
+noremap! <<BS> <Nop>
+
+noremap! }<BS> <Nop>
+noremap! )<BS> <Nop>
+noremap! ]<BS> <Nop>
+noremap! ><BS> <Nop>
+
+" These members follow an opposite rule, because the default behavior is better
+" suited to insert the single character
+" Applies to:
+"   1. "
+"   2. '
+" Rules:
+"   1. <char> prints the <char> once
+"   2. <char><char> makes an empty <char><char>, and puts the cursor inside
+"   2. <char><BS> does nothing
+" Rule 1:
+noremap! " "
+noremap! ' '
+" Rule 2:
+noremap! "" ""<left>
+noremap! '' ''<left>
+" Rule 3:
+noremap! "<BS> <Nop>
+noremap! '<BS> <Nop>
+
+" In classes, functions, and scopes, we need more fine grained rules for braces
+" <leader>c puts { on a new line, and }; on a new line
+" <leader>f puts { on a new line, and } on a new line
+" <leader>e puts { at the end of this line, and } on a new line
+nnoremap <leader>c o{<CR>};<C-o>O
+nnoremap <leader>f o{<CR>}<C-o>O
+nnoremap <silent> <leader>e :call StripTrailingWhitespaces()<cr>A {<CR>}<C-o>O
+
+"   }}}
+"   Jump Commands ---------------------------------------------------------- {{{
+
+" Keep searches in the middle of the window
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+" Same when jumping around
+nnoremap <c-o> <c-o>zzzv
+nnoremap <c-i> <c-i>zzzv
+
+" gi goes to last insert location, let gI go to last change location
+nnoremap gI `.
+
+function! SaveCursor() " {{{
+    let b:cursorPosition = winsaveview()
+endfunction " }}}
+
+function! RestoreCursor() " {{{
+    call winrestview(b:cursorPosition)
+endfunction " }}}
+
+" <star> operations
+" Don't jump to the next instance on <star>
+nnoremap <silent> *
+            \ :call SaveCursor()<CR>
+            \*
+            \:call RestoreCursor()<CR>
+
+" Visual mode search for selected text
+function! s:VSetSearch() " {{{
+  let temp = @@
+  norm! gvy
+  let @/ = '\V' . substitute(escape(@@, '\'), '\n', '\\n', 'g')
+  let @@ = temp
+endfunction " }}}
+
+vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
+vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
+
+" convenient for using the YCM engine to jump around to declarations/definitions
+" TODO move to YCM configurations
+nnoremap <silent> <leader>dl :YcmCompleter GoToDeclaration<cr>
+nnoremap <silent> <leader>df :YcmCompleter GoToDefinition<cr>
+nnoremap <silent> <leader>go :YcmCompleter GoTo<cr>
+
+"   }}}
+"   Folding ---------------------------------------------------------------- {{{
+set foldlevelstart=0 " start with 1st level folds open
+
+" Space to toggle folds.
+nnoremap <Space> za
+vnoremap <Space> za
+
+" 'Focus' the current line.  Basically:
+"
+" 1. Close all folds.
+" 2. Open just the folds containing the current line.
+" 3. Center the line on screen.
+"
+" Note: This mapping wipes out the z mark, which I never use, and disables
+"       background vim!
+nnoremap <c-z> mzzMzvzz`z
+
+" Use a nicer folder text method, forget where I got this
+function! MyFoldText() " {{{
+    let line = getline(v:foldstart)
+
+    let nucolwidth = &fdc + &number * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 3
+    let foldedlinecount = v:foldend - v:foldstart
+
+    " expand tabs into spaces
+    let onetab = strpart('          ', 0, &tabstop)
+    let line = substitute(line, '\t', onetab, 'g')
+
+    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+    return line . '…' . repeat(" ",fillcharcount) . foldedlinecount . '…' . ' '
+endfunction " }}}
+
+set foldtext=MyFoldText()
+
+"   }}}
+"   Advanced Grep ---------------------------------------------------------- {{{
+" <leader>gg
+"   1. Recursively greps for the word under the cursor
+"   2. Populates the quickfix list
+"   3. Opens the quickfix window for jumping to occurences
+vnoremap <leader>gg y:grep -Hrn '<c-r>0' .<cr>:copen<cr>
+
+"   }}}
+"   Error Checking --------------------------------------------------------- {{{
+
+" Use <l>dt to check the file for errors, and populate the loclist with them
+" TODO this goes in YCM configs
+nnoremap <silent> <leader>di :YcmDiags<cr>
+let g:ycm_key_detailed_diagnostics = '<leader>dt'
+
+"   }}}
+"   Ctags ------------------------------------------------------------------ {{{
+
+function! RegenerateTags() " {{{
+    silent !clear
+    silent !ctags
+            \ --extra=+fq
+            \ --fields=+aiKlmnSz
+            \ --c++-kinds=+lpx
+            \ --c-kinds=+lpx
+            \ --recurse=yes
+    redraw!
+endfunction " }}}
+
+nnoremap <silent> <localleader>t :call RegenerateTags()<CR>
+
+"   }}}
+"   GTest -----------------------------------------------------------------  {{{
+
+" Returns the contents of the visual selection
+function! GetVisualSelection() " {{{
+  " Why is this not a built-in Vim script function?!
+  let [lnum1, col1] = getpos("'<")[1:2]
+  let [lnum2, col2] = getpos("'>")[1:2]
+  let lines = getline(lnum1, lnum2)
+  let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
+  let lines[0] = lines[0][col1 - 1:]
+  return join(lines, "\n")
+endfunction " }}}
+
+" This is read by ultisnips to populate test fixture names
+function! GtestFixtureName() " {{{
+    let b:UltiSnips_GtestFixtureName = GetVisualSelection()
+endfunction " }}}
+
+vnoremap <silent> <leader>fn :call GtestFixtureName()<cr>
+
+"   }}}
+" }}}
+" Plugin Mappings and Settings --------------------------------------------- {{{
+"   NERDTree --------------------------------------------------------------- {{{
+" TODO evaluate
+
+let NERDTreeChDirMode=2         " Change the CWD when the tree root changers
+let NERDTreeRespectWildIgnore=1 " Don't show files that are ignored by vim
+let NERDTreeShowHidden=1        " Show hidden files by default
+let NERDTreeShowLineNumbers=0   " Don't show line numbers in the nerdtree window
+let NERDTreeDirArrows=1         " Use fancy characters
+let NERDTreeAutoDeleteBuffer=1  " Delete buffers removed by nerdtree
+
+" Open or close the nerdtree window
+nnoremap <c-t> :NERDTreeToggle<cr>
+
+" Find the current file in nerdtree
+nnoremap <leader>t :NERDTreeFind<cr>
+
+"   }}}
+"   Tabularize Shorthands -------------------------------------------------- {{{
+" TODO create named assignments from the ones we care about, and save them in
+" the correct place, then remove all these, except for the first
+
+" al quickly opens for aligning on an inputted value, the others are shorthands
+" for pre-programmed alignments on the first of the given token
+" Note: To edit these Tabularize functions, or create new ones, open up the
+" Tabs.vim file under TODO
+nnoremap <leader>al  :Tabular /\v/l1c1<left><left><left><left><left>
+vnoremap <leader>al  :Tabular /\v
+nnoremap <leader>fq  :Tabular first_quote<cr>
+vnoremap <leader>fq  :Tabular first_quote<cr>
+nnoremap <leader>fa  :Tabular first_apost<cr>
+vnoremap <leader>fa  :Tabular first_apost<cr>
+nnoremap <leader>fbl :Tabular first_block<cr>
+vnoremap <leader>fbl :Tabular first_block<cr>
+nnoremap <leader>fp  :Tabular first_paren<cr>
+vnoremap <leader>fp  :Tabular first_paren<cr>
+nnoremap <leader>fbr :Tabular first_bracket<cr>
+vnoremap <leader>fbr :Tabular first_bracket<cr>
+nnoremap <leader>fc  :Tabular first_colon<cr>
+vnoremap <leader>fc  :Tabular first_colon<cr>
+nnoremap <leader>fs  :Tabular first_slash<cr>
+vnoremap <leader>fs  :Tabular first_slash<cr>
+nnoremap <leader>fbs :Tabular first_back_slash<cr>
+vnoremap <leader>fbs :Tabular first_back_slash<cr>
+" built in tabular bindings
+nnoremap <leader>as  :Tabular assignment<cr>
+vnoremap <leader>as  :Tabular assignment<cr>
+nnoremap <leader>sp  :Tabular two_spaces<cr>
+vnoremap <leader>sp  :Tabular two_spaces<cr>
+nnoremap <leader>ms  :Tabular multiple_spaces<cr>
+vnoremap <leader>ms  :Tabular multiple_spaces<cr>
+nnoremap <leader>li  :Tabular argument_list<cr>
+vnoremap <leader>li  :Tabular argument_list<cr>
+
+"   }}}
+"   UltiSnips -------------------------------------------------------------- {{{
+" TODO evaluate
+
+" Open the edit snippet window in a vertical split
+let g:UltiSnipsEditSplit="vertical"
+
+" Where to save my created snippets
+let g:UltiSnipsSnippetDir="~/.vim/UltiSnips"
+
+" Set the trigger to c-space
+let g:UltiSnipsExpandTrigger="<leader>f"
+
+" The exclamation mark is important, otherwise edit defaults to the first,
+" although this isn't usally the one we want to edit
+nnoremap <leader>snip :UltiSnipsEdit!<cr>
+
+"   }}}
+"   StatusLine ------------------------------------------------------------- {{{
+" TODO evaluate
+
+set statusline=
+set statusline+=%-3.3n\                                            "buffer nr
+set statusline+=%f\                                                "file name
+set statusline+=%h%m%r%w                                           "flags
+set statusline+=[%{strlen(&ft)?&ft:'none'},                        "filetype
+set statusline+=%{strlen(&fenc)?&fenc:&enc},                       "encoding
+set statusline+=%{&fileformat}]                                    "file format
+set statusline+=%=                                                 "right align
+set statusline+=%{synIDattr(synID(line('.'),col('.'),1),'name')}\  "highlight
+set statusline+=%b,0x%-8B\                                         "current char
+set statusline+=%-14.(%l,%c%V%)\%P                                 "offset
+
+"   }}}
+"   YouCompleteMe ---------------------------------------------------------- {{{
+" TODO evaluate
+
+let g:ycm_collect_identifiers_from_tags_files = 1      "use tags files
+let g:ycm_autoclose_preview_window_after_insertion = 1 "leave window open until we leave insert
+let g:ycm_seed_identifiers_with_syntax = 1             "seed ycm completions
+let g:ycm_confirm_extra_conf = 0                       "stop asking if I want to use or not
+let g:ycm_goto_buffer_command = 'vertical-split'       "open in v-split
+" let g:ycm_auto_trigger = 0                             " don't use automatic complete, too slow
+let g:ycm_key_invoke_completion = '<S-Space>'
+let g:ycm_server_log_level = 'debug'
+
+"   }}}
+"   CompiledbPath ---------------------------------------------------------- {{{
+" TODO evaluate
+
+augroup add_paths
+    autocmd!
+    " allows 'gf' file traversal from compile_commands.json
+    autocmd VimEnter * :CompileDbPathIfExists compile_commands.json
+augroup END
+
+"   }}}
+"   Airline ---------------------------------------------------------------- {{{
+" TODO evaluate
+
+let g:airline_powerline_fonts=1
+
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+
+" powerline symbols
+let g:airline_left_sep = '»'
+let g:airline_left_sep = '▶'
+let g:airline_right_sep = '«'
+let g:airline_right_sep = '◀'
+let g:airline_symbols.crypt = '🔒'
+let g:airline_symbols.linenr = '␊'
+let g:airline_symbols.linenr = '␤'
+let g:airline_symbols.linenr = '¶'
+let g:airline_symbols.branch = '⎇'
+let g:airline_symbols.paste = 'ρ'
+let g:airline_symbols.paste = 'Þ'
+let g:airline_symbols.paste = '∥'
+let g:airline_symbols.whitespace = 'Ξ'
+
+"   }}}
+"   CamelCaseMotion -------------------------------------------------------- {{{
+" TODO evaluate
+
+" call camelcasemotion#CreateMotionMappings('<leader>')
+
+"   }}}
+" }}}
+" AutoCommand Groups ------------------------------------------------------- {{{
+"   Common AutoGroup Commands ---------------------------------------------- {{{
+augroup ALL
+  autocmd!
+
+  " Strips file trailing white space, preserving cursor position
+  function! StripTrailingWhitespaces() " {{{
+      let l = line(".")
+      let c = col(".")
+      %s/\s\+$//e
+      call cursor(l, c)
+  endfunction " }}}
+
+  " Clear trailing white spaces when entering, saving, or leaving a buffer
+  au BufEnter,BufWritePre,BufLeave * silent! call StripTrailingWhitespaces()
+
+  " If we made changes to the file, save them before switching buffers
+  au BufLeave * silent! update
+
+  " Refresh the current buffer when we navigate to it or enter insert mode
+  " if we have modify permissions
+  au BufEnter,InsertEnter * if &modifiable | execute "checktime" @% | endif
+
+  " Resize splits when the window is resized
+  au VimResized * wincmd =
+
+  " Show trailing characters iff not in insert mode
+  " The char here should match the one set in listchars above
+  au InsertEnter * :set listchars-=trail:^
+  au InsertLeave * :set listchars+=trail:^
+
+  " Return to the same line when opening a file
+  au BufReadPost *
+          \ if line("'\"") > 0 && line("'\"") <= line("$") |
+          \     execute "normal! g'\"" |
+          \ endif
+
+augroup end
+
+"   }}}
+"   C and C++ -------------------------------------------------------------- {{{
+augroup FileType_c_cpp
+   autocmd!
+
+   " treat .pde as cpp files
+   au BufRead,BufNewFile *.pde set filetype=cpp
+
+   " add the gtest ultisnips settings for cpp files
+   au FileType c,cpp UltiSnipsAddFiletypes gtest
+
+augroup END
+"   }}}
+"   Make ------------------------------------------------------------------- {{{
+augroup FileType_make
+   autocmd!
+
+   " insert 3 spaces for tab, columnize everything to multiples of 3 spaces
+   au FileType make setlocal
+               \ tabstop=8
+               \ shiftwidth=8
+               \ shiftround
+               \ softtabstop=8
+               \ noexpandtab
+               \ textwidth=80
+
+augroup END
+"   }}}
+"   Vim -------------------------------------------------------------------- {{{
+augroup FileType_vim
+    autocmd!
+
+    " Enable folding in this vimrc file
+    au FileType vim setlocal foldmethod=marker
+
+    " When we source this file, we lose file settings, because we've cleared the
+    " autogroup, but the filetype event has already been fired
+    "
+    " We can fix this by consuming the SourceCmd event, then setting the ft
+    "
+    " The only caveat is we also have to source the file ourselves here
+    au SourceCmd * source <afile> | setlocal ft=vim
+
+augroup END
+"   }}}
+" }}}
+" Borrowed Stuffs ---------------------------------------------------------- {{{
+"   Next and Last Motions -------------------------------------------------- {{{
+"
+" Motion for "next/last object".  "Last" here means "previous", not "final".
+" Unfortunately the "p" motion was already taken for paragraphs.
+"
+" Next acts on the next object of the given type, last acts on the previous
+" object of the given type.  These don't necessarily have to be in the current
+" line.
+"
+" Currently works for (, [, {, and their shortcuts b, r, B.
+"
+" Next kind of works for ' and " as long as there are no escaped versions of
+" them in the string (TODO: fix that).  Last is currently broken for quotes
+" (TODO: fix that).
+"
+" Some examples (C marks cursor positions, V means visually selected):
+"
+" din'  -> delete in next single quotes                foo = bar('spam')
+"                                                      C
+"                                                      foo = bar('')
+"                                                                C
+"
+" canb  -> change around next parens                   foo = bar('spam')
+"                                                      C
+"                                                      foo = bar
+"                                                               C
+"
+" vin"  -> select inside next double quotes            print "hello ", name
+"                                                       C
+"                                                      print "hello ", name
+"                                                             VVVVVV
+
+onoremap an :<c-u>call <SID>NextTextObject('a', '/')<cr>
+xnoremap an :<c-u>call <SID>NextTextObject('a', '/')<cr>
+onoremap in :<c-u>call <SID>NextTextObject('i', '/')<cr>
+xnoremap in :<c-u>call <SID>NextTextObject('i', '/')<cr>
+
+onoremap al :<c-u>call <SID>NextTextObject('a', '?')<cr>
+xnoremap al :<c-u>call <SID>NextTextObject('a', '?')<cr>
+onoremap il :<c-u>call <SID>NextTextObject('i', '?')<cr>
+xnoremap il :<c-u>call <SID>NextTextObject('i', '?')<cr>
+
+function! s:NextTextObject(motion, dir) " {{{
+    let c = nr2char(getchar())
+    let d = ''
+
+    if c ==# "b" || c ==# "(" || c ==# ")"
+        let c = "("
+    elseif c ==# "B" || c ==# "{" || c ==# "}"
+        let c = "{"
+    elseif c ==# "r" || c ==# "[" || c ==# "]"
+        let c = "["
+    elseif c ==# "'"
+        let c = "'"
+    elseif c ==# '"'
+        let c = '"'
+    else
+        return
+    endif
+
+    " Find the next opening-whatever.
+    execute "normal! " . a:dir . c . "\<cr>"
+
+    if a:motion ==# 'a'
+        " If we're doing an 'around' method, we just need to select around it
+        " and we can bail out to Vim.
+        execute "normal! va" . c
+    else
+        " Otherwise we're looking at an 'inside' motion.  Unfortunately these
+        " get tricky when you're dealing with an empty set of delimiters because
+        " Vim does the wrong thing when you say vi(.
+
+        let open = ''
+        let close = ''
+
+        if c ==# "("
+            let open = "("
+            let close = ")"
+        elseif c ==# "{"
+            let open = "{"
+            let close = "}"
+        elseif c ==# "["
+            let open = "\\["
+            let close = "\\]"
+        elseif c ==# "'"
+            let open = "'"
+            let close = "'"
+        elseif c ==# '"'
+            let open = '"'
+            let close = '"'
+        endif
+
+        " We'll start at the current delimiter.
+        let start_pos = getpos('.')
+        let start_l = start_pos[1]
+        let start_c = start_pos[2]
+
+        " Then we'll find it's matching end delimiter.
+        if c ==# "'" || c ==# '"'
+            " searchpairpos() doesn't work for quotes, because fuck me.
+            let end_pos = searchpos(open)
+        else
+            let end_pos = searchpairpos(open, '', close)
+        endif
+
+        let end_l = end_pos[0]
+        let end_c = end_pos[1]
+
+        call setpos('.', start_pos)
+
+        if start_l == end_l && start_c == (end_c - 1)
+            " We're in an empty set of delimiters.  We'll append an "x"
+            " character and select that so most Vim commands will do something
+            " sane.  v is gonna be weird, and so is y.  Oh well.
+            execute "normal! ax\<esc>\<left>"
+            execute "normal! vi" . c
+        elseif start_l == end_l && start_c == (end_c - 2)
+            " We're on a set of delimiters that contain a single, non-newline
+            " character.  We can just select that and we're done.
+            execute "normal! vi" . c
+        else
+            " Otherwise these delimiters contain something.  But we're still not
+            " sure Vim's gonna work, because if they contain nothing but
+            " newlines Vim still does the wrong thing.  So we'll manually select
+            " the guts ourselves.
+            let whichwrap = &whichwrap
+            set whichwrap+=h,l
+
+            execute "normal! va" . c . "hol"
+
+            let &whichwrap = whichwrap
+        endif
+    endif
+endfunction " }}}
+"   }}}
+"   Highlighting Helpers --------------------------------------------------- {{{
+"       Indent Guides ------------------------------------------------------ {{{
+
+" Toggles the indent guides, mapped below
+let g:indentguides_state = 0
+function! IndentGuides() " {{{
+    if g:indentguides_state
+        let g:indentguides_state = 0
+        2match None
+    else
+        let g:indentguides_state = 1
+        execute '2match IndentGuides /\%(\_^\s*\)\@<=\%(\%'.(0*&sw+1).'v\|\%'.(1*&sw+1).'v\|\%'.(2*&sw+1).'v\|\%'.(3*&sw+1).'v\|\%'.(4*&sw+1).'v\|\%'.(5*&sw+1).'v\|\%'.(6*&sw+1).'v\|\%'.(7*&sw+1).'v\)\s/'
+    endif
+endfunction " }}}
+
+" Change the indent guide highlighting
+hi def IndentGuides guibg=#303030 ctermbg=234
+
+" <leader>i toggles indent guides on or off
+nnoremap <leader>i :call IndentGuides()<cr>
+
+"       }}}
+"       Block Colors ------------------------------------------------------- {{{
+
+" toggles block inguides, mapped below
+let g:blockcolor_state = 0
+function! BlockColor() " {{{
+    if g:blockcolor_state
+        let g:blockcolor_state = 0
+        call matchdelete(77881)
+        call matchdelete(77882)
+        call matchdelete(77883)
+        call matchdelete(77884)
+        call matchdelete(77885)
+        call matchdelete(77886)
+    else
+        let g:blockcolor_state = 1
+        call matchadd("BlockColor1", '^ \{4}.*', 1, 77881)
+        call matchadd("BlockColor2", '^ \{8}.*', 2, 77882)
+        call matchadd("BlockColor3", '^ \{12}.*', 3, 77883)
+        call matchadd("BlockColor4", '^ \{16}.*', 4, 77884)
+        call matchadd("BlockColor5", '^ \{20}.*', 5, 77885)
+        call matchadd("BlockColor6", '^ \{24}.*', 6, 77886)
+    endif
+endfunction " }}}
+
+" Change the block guide highlighting
+hi def BlockColor1 guibg=#222222 ctermbg=234
+hi def BlockColor2 guibg=#2a2a2a ctermbg=235
+hi def BlockColor3 guibg=#353535 ctermbg=236
+hi def BlockColor4 guibg=#3d3d3d ctermbg=237
+hi def BlockColor5 guibg=#444444 ctermbg=238
+hi def BlockColor6 guibg=#4a4a4a ctermbg=239
+
+" <leader>b toggles block highlighting on or off
+nnoremap <leader>b :call BlockColor()<cr>
+
+"       }}}
+"       Highlight Word ----------------------------------------------------- {{{
+
+" This mini-plugin provides a few mappings for highlighting words temporarily.
+"
+" Sometimes you're looking at a hairy piece of code and would like a certain
+" word or two to stand out temporarily.  You can search for it, but that only
+" gives you one color of highlighting.  Now you can use <leader>N where N is
+" a number from 1-6 to highlight the current word in a specific color.
+
+let g:hi_interesting_word_state = [0, 0, 0, 0, 0, 0]
+function! HiInterestingWord(n) " {{{
+    " delete all match groups
+    let l:match_mid = 86750
+
+    if a:n == 0
+        for l:position in [1, 2, 3, 4, 5, 6]
+            let g:hi_interesting_word_state[l:position-1] = 0
+            silent! call matchdelete(l:match_mid + l:position)
+        endfor
+    else
+        " Calculate an arbitrary match ID.  Hopefully nothing else is using it.
+        let l:match_final = l:match_mid + a:n
+        let l:index = a:n- 1
+
+        if g:hi_interesting_word_state[l:index]
+            let g:hi_interesting_word_state[l:index] = 0
+            silent! call matchdelete(l:match_final)
+        else
+            let g:hi_interesting_word_state[l:index] = 1
+
+            " Save cursor, yank word to z register, create pattern
+            " match the pattern, restore cursor
+            call SaveCursor()
+            normal! "zyiw
+            let l:pat = '\V\<' . escape(@z, '\') . '\>'
+            call matchadd("InterestingWord" . a:n, l:pat, 1, l:match_final)
+            call RestoreCursor()
+        endif
+    endif
+endfunction " }}}
+
+" Adjust the highlight settings
+hi def InterestingWord1 guifg=#000000 ctermfg=16 guibg=#ffa724 ctermbg=214
+hi def InterestingWord2 guifg=#000000 ctermfg=16 guibg=#aeee00 ctermbg=154
+hi def InterestingWord3 guifg=#000000 ctermfg=16 guibg=#8cffba ctermbg=121
+hi def InterestingWord4 guifg=#000000 ctermfg=16 guibg=#b88853 ctermbg=137
+hi def InterestingWord5 guifg=#000000 ctermfg=16 guibg=#ff9eb8 ctermbg=211
+hi def InterestingWord6 guifg=#000000 ctermfg=16 guibg=#ff2c4b ctermbg=195
+
+" Use <leader><digit> to apply special highlighting to the current word
+" And <leader>0 will clear all active highlight groups
+nnoremap <silent> <leader>1 :call HiInterestingWord(1)<cr>
+nnoremap <silent> <leader>2 :call HiInterestingWord(2)<cr>
+nnoremap <silent> <leader>3 :call HiInterestingWord(3)<cr>
+nnoremap <silent> <leader>4 :call HiInterestingWord(4)<cr>
+nnoremap <silent> <leader>5 :call HiInterestingWord(5)<cr>
+nnoremap <silent> <leader>6 :call HiInterestingWord(6)<cr>
+nnoremap <silent> <leader>0 :call HiInterestingWord(0)<cr>
+
+"       }}}
+"   }}}
+"   Number Motions --------------------------------------------------------- {{{
+
+" Motion for numbers
+" Does not work with floats
+" Lets you do things like this:
+"
+" margin-top: 200px; -> daN -> margin-top: px;
+
+onoremap N :<c-u>call <SID>NumberTextObject(0)<cr>
+xnoremap N :<c-u>call <SID>NumberTextObject(0)<cr>
+onoremap aN :<c-u>call <SID>NumberTextObject(1)<cr>
+xnoremap aN :<c-u>call <SID>NumberTextObject(1)<cr>
+onoremap iN :<c-u>call <SID>NumberTextObject(1)<cr>
+xnoremap iN :<c-u>call <SID>NumberTextObject(1)<cr>
+
+function! s:NumberTextObject(whole) " {{{
+    let num = '\v[0-9]'
+
+    " If the current char isn't a number, walk forward.
+    while getline('.')[col('.') - 1] !~# num
+        normal! l
+    endwhile
+
+    " Now that we're on a number, start selecting it.
+    normal! v
+
+    " If the char after the cursor is a number, select it.
+    while getline('.')[col('.')] =~# num
+        normal! l
+    endwhile
+
+    " If we want an entire word, flip the select point and walk.
+    if a:whole
+        normal! o
+
+        while col('.') > 1 && getline('.')[col('.') - 2] =~# num
+            normal! h
+        endwhile
+    endif
+endfunction " }}}
+
+"   }}}
+" }}}

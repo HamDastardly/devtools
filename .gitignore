@@ -1,0 +1,7 @@
+# vim
+**/vim/bundle/
+**/vim/tmp/
+**/vim/.netrwhist
+
+# Downloaded Sources
+src

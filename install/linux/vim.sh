@@ -1,4 +1,5 @@
 set -x -e
+source commands.sh
 
 $APT_REMOVE vim vim-runtime gvim vim-tiny vim-common vim-gui-common
 $APT_INSTALL cscope python-dev python3-dev ruby-dev libncurses5

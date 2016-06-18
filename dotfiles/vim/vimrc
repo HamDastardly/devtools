@@ -1,18 +1,20 @@
-" Author ------------------------------------------------------------------- {{{
+" Preamble ----------------------------------------------------------------- {{{
+"   Author ----------------------------------------------------------------- {{{
 
 " Hamilton Little: hamilton.little@gmail.com
 " Github Username: HamboLagos
 
-" }}}
-" Preamble ----------------------------------------------------------------- {{{
+"   }}}
 "   Note on Operators ------------------------------------------------------ {{{
+
 " nmap: normal           | map (NVO mode)
 " vmap: visual + select  | map (NVO mode)
 " omap: operator pending | map (NVO mode)
 " imap: insert           | map! (IC mode)
 " cmap: command line     | map! (IC mode)
+
 "   }}}
-"   Vundle Plugins --------------------------------------------------------- {{{
+"   Installed Plugins ------------------------------------------------------ {{{
 
 " Required before adding plugins
 set nocompatible
@@ -20,21 +22,26 @@ filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 
 call vundle#begin()
-
-" Required for vundle bootstrap
-Plugin 'VundleVim/Vundle.vim'
-
-" NerdTree file browser
+Plugin 'VundleVim/Vundle.vim' " Required for Vundle Bootstrap
 Plugin 'scrooloose/nerdtree'
+Plugin 'wincent/command-t'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'tpope/vim-surround'
+Plugin 'bkad/CamelCaseMotion'
+Plugin 'vim-airline/vim-airline'
+Plugin 'godlygeek/tabular'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'honza/vim-snippets'
+Plugin 'tpope/vim-abolish'
 
-" ControlP fuzzy file finder
-Plugin 'ctrlpvim/ctrlp.vim'
-
+" master is broken, managing stable releases manually
+Plugin 'SirVer/ultisnips', {'pinned': 1}
 call vundle#end()
 
 " Required after adding plugins
 filetype plugin indent on
 syntax on
+
 "   }}}
 "   Miscellany ------------------------------------------------------------- {{{
 
@@ -42,8 +49,8 @@ syntax on
 set shell=/bin/bash
 
 " Uncomment to control colorscheme manually, otherwise it falls to the shell
-" set background=dark
-" colorscheme solarized
+set background=dark
+colorscheme solarized
 
 " Everybody follow the leader
 let mapleader = ","
@@ -71,7 +78,7 @@ if !has("gui_running")
 endif
 
 " dt between <esc> and <char> to interpret as <A-char>, vs <esc><char>
-set timeout ttimeoutlen=25
+set timeout ttimeoutlen=50
 
 "   }}}
 " }}}
@@ -110,7 +117,36 @@ set listchars=tab:>-,trail:^
 set encoding=utf-8
 
 "   }}}
+"   StatusLine ------------------------------------------------------------- {{{
+
+" Enable the following in the absence of powerline/airline status lines
+" set statusline=
+" set statusline+=%-3.3n\                                            "buffer nr
+" set statusline+=%f\                                                "file name
+" set statusline+=%h%m%r%w                                           "flags
+" set statusline+=[%{strlen(&ft)?&ft:'none'},                        "filetype
+" set statusline+=%{strlen(&fenc)?&fenc:&enc},                       "encoding
+" set statusline+=%{&fileformat}]                                    "file format
+" set statusline+=%=                                                 "right align
+" set statusline+=%{synIDattr(synID(line('.'),col('.'),1),'name')}\  "highlight
+" set statusline+=%b,0x%-8B\                                         "current char
+" set statusline+=%-14.(%l,%c%V%)\%P                                 "offset
+
+"   }}}
 "   Text Formatting -------------------------------------------------------- {{{
+"       Tabs, spaces, wrapping --------------------------------------------- {{{
+
+" Some of these are overridden by the file-specific augroups
+set tabstop=4
+set shiftwidth=4
+set shiftround
+set softtabstop=4
+set expandtab
+set nowrap
+set textwidth=80
+
+"       }}}
+"       Formatting Options ------------------------------------------------- {{{
 
 " Formatting Options - When to format text and automatic line wrapping
 " We can try formatting anything with 'normal! gq'
@@ -137,8 +173,16 @@ set formatoptions+=1 " Prefer breaking a line before a 1 letter word
 set formatoptions+=j " remove comment leader when joining lines
 
 " Regex to recognize lists, and apply better formatting
-"   one or more <digit>,-,*,+ followed by one ],:,.,),},<tab>,<space>
-set formatlistpat=\\v^\\s*(\\d+\|\\-+\|\\*+\|\\++)[\\]:.)}\\t\ ]\\s*
+" Format \v^\s*[0-9a-zA-Z+-*]+[:.)}\]]*\s+
+"   <line start>
+"   <0 or more <whitespace>>
+"   <1 or more <alphanumeric or +-*>>
+"   <0 or 1 <:.)}]>>
+"   <1 or more <whitespace>>
+let &formatlistpat='\v^\s*[0-9a-zA-z+-*]+[:.)}\]]?\s+'
+
+"       }}}
+"       CIndentation Options ----------------------------------------------- {{{
 
 function! SetCInOptions() " {{{
     " clear all options, and set the ones we care about
@@ -189,7 +233,7 @@ function! SetCInOptions() " {{{
     for l:opt in l:default_options
         " If the first char in opt does not exist in &cinoptions, its missing
         " Case sensitivity is required here as well
-        if match(&cinoptions, strcharpart(l:opt, 0, 1)."\C") == -1
+        if match(&cinoptions, strcharpart(l:opt, 0, 1)."\\C") == -1
             let &cinoptions.=",".l:opt
         endif
     endfor
@@ -202,6 +246,7 @@ call SetCInOptions()
 " only use 1 space after a punctuation mark {.?!}
 set nojoinspaces
 
+"       }}}
 "   }}}
 "   WildMenu --------------------------------------------------------------- {{{
 " TODO Don't know if this works with and/or against YCM...
@@ -218,18 +263,6 @@ set wildignore+=*.d,*.su                         "dependency files
 set wildignore+=*.spl                            "compiled spelling word lists
 set wildignore+=*.sw?                            "Vim swap files
 set wildignore+=*~                               "Unix temp files
-
-"   }}}
-"   Tabs, spaces, wrapping ------------------------------------------------- {{{
-
-" Some of these are overridden by the file-specific augroups
-set tabstop=4
-set shiftwidth=4
-set shiftround
-set softtabstop=4
-set expandtab
-set nowrap
-set textwidth=80
 
 "   }}}
 "   Backups ---------------------------------------------------------------- {{{
@@ -256,11 +289,16 @@ endif
 "   VIMRC Editing ---------------------------------------------------------- {{{
 
 " make the vimrc file easy to edit and source
-" ev open in split window, EV opens in new tab
+"   vs open in new split window
+"   vt opens in new tab
+"   ve opens in the current window
+"   vv saves vimrc, sources it, and updates plugins
 nnoremap <silent> <leader>vs :vsplit $MYVIMRC<cr>
 nnoremap <silent> <leader>vt :tabnew $MYVIMRC<cr>
 nnoremap <silent> <leader>ve :edit $MYVIMRC<cr>
-nnoremap <silent> <leader>vv :write $MYVIMRC<cr>:source $MYVIMRC<cr>
+nnoremap <leader>vv
+            \ :write $MYVIMRC<cr>
+            \:source $MYVIMRC<cr>
 
 "   }}}
 "   Visual Selections ------------------------------------------------------ {{{
@@ -280,10 +318,6 @@ nnoremap <silent> <leader>h :nohl<cr>
 " plain text
 abbrev hte the
 abbrev teh the
-
-abbrev malv mavl
-abbrev MALV MAVL
-abbrev Malv Mavl
 
 " ex commands
 if has("user_commands")
@@ -315,12 +349,12 @@ nnoremap <leader>sb  :%s:\v::gc<left><left><left><left>
 "   }}}
 "   Linewise manipulation -------------------------------------------------- {{{
 
-" H goes to beginning of line
-" gH goes to the first char
-" L goes to end of line
+" H,L move to the beginning and end of the line
+" gH,gL move to the first and last non-whitespace char in the line
 noremap H 0
 noremap gH ^
 noremap L $
+noremap gL g_
 
 " <S-k> breaks the line (opposite of <S-j>)
 nnoremap <S-k> i<cr><esc>
@@ -336,7 +370,7 @@ nnoremap <silent><A-j> :set paste<CR>m`o<Esc>``:set nopaste<CR>
 nnoremap <silent><A-k> :set paste<CR>m`O<Esc>``:set nopaste<CR>
 
 "   }}}
-"   Insert/Command Mode Movement-------------------------------------------- {{{
+"   Insert/Command Mode Movement ------------------------------------------- {{{
 
 " use <A-{h|j|k|l}> for movement in ci mode
 noremap! <A-h> <left>
@@ -346,79 +380,19 @@ noremap! <A-k> <up>
 
 "   }}}
 "   Auto-Close Members ----------------------------------------------------- {{{
-
-" We're about to clobber the C/C++ derefence-access operator (->),
-" So we preserve its meaning here
-noremap! -> ->
-
-" For each of the following, these rules apply (in insert or command mode):
-" Applies to:
-"   1. { }
-"   2. ( )
-"   3. [ ]
-"   4. < >
-" Rules:
-"   1. <open> makes an empty <open><close>, and puts the cursor inside
-"   2. <close> makes an empty <open><close>, and puts the cursor outside
-"   3. <close><close> and <open><open> prints <open> or <close> once
-"   4. <open><BS> and <close><BS> do nothing
-" Rule 1:
-noremap! { {}<left>
-noremap! ( ()<left>
-noremap! [ []<left>
-noremap! < <><left>
-" Rule 2:
-noremap! } {}
-noremap! ) ()
-noremap! ] []
-noremap! > <>
-" Rule 3:
-noremap! {{ {
-noremap! (( (
-noremap! [[ [
-noremap! << <
-
-noremap! }} }
-noremap! )) )
-noremap! ]] ]
-noremap! >> >
-" Rule 4:
-noremap! {<BS> <Nop>
-noremap! (<BS> <Nop>
-noremap! [<BS> <Nop>
-noremap! <<BS> <Nop>
-
-noremap! }<BS> <Nop>
-noremap! )<BS> <Nop>
-noremap! ]<BS> <Nop>
-noremap! ><BS> <Nop>
-
-" These members follow an opposite rule, because the default behavior is better
-" suited to insert the single character
-" Applies to:
-"   1. "
-"   2. '
-" Rules:
-"   1. <char> prints the <char> once
-"   2. <char><char> makes an empty <char><char>, and puts the cursor inside
-"   2. <char><BS> does nothing
-" Rule 1:
-noremap! " "
-noremap! ' '
-" Rule 2:
-noremap! "" ""<left>
-noremap! '' ''<left>
-" Rule 3:
-noremap! "<BS> <Nop>
-noremap! '<BS> <Nop>
+"TODO these need to be remapped, interfere with camel case motion
 
 " In classes, functions, and scopes, we need more fine grained rules for braces
 " <leader>c puts { on a new line, and }; on a new line
 " <leader>f puts { on a new line, and } on a new line
 " <leader>e puts { at the end of this line, and } on a new line
-nnoremap <leader>c o{<CR>};<C-o>O
-nnoremap <leader>f o{<CR>}<C-o>O
-nnoremap <silent> <leader>e :call StripTrailingWhitespaces()<cr>A {<CR>}<C-o>O
+" nnoremap <leader>c o{<CR>};<C-o>O
+" nnoremap <leader>f o{<CR>}<C-o>O
+" nnoremap <silent> <leader>e :call StripTrailingWhitespaces()<cr>A {<CR>}<C-o>O
+
+" use a double ';' to end the line
+nnoremap ;; A;<esc>
+inoremap ;; <C-o>A;<esc>
 
 "   }}}
 "   Jump Commands ---------------------------------------------------------- {{{
@@ -554,7 +528,7 @@ function! GtestFixtureName() " {{{
     let b:UltiSnips_GtestFixtureName = GetVisualSelection()
 endfunction " }}}
 
-vnoremap <silent> <leader>fn :call GtestFixtureName()<cr>
+vnoremap <silent> <leader>set :call GtestFixtureName()<cr>
 
 "   }}}
 " }}}
@@ -572,132 +546,72 @@ let NERDTreeAutoDeleteBuffer=1  " Delete buffers removed by nerdtree
 " Open or close the nerdtree window
 nnoremap <c-t> :NERDTreeToggle<cr>
 
-" Find the current file in nerdtree
-nnoremap <leader>t :NERDTreeFind<cr>
+" Find the current file in the directory tree
+nnoremap <c-f> :NERDTreeFind<cr>
 
 "   }}}
-"   Tabularize Shorthands -------------------------------------------------- {{{
-" TODO create named assignments from the ones we care about, and save them in
-" the correct place, then remove all these, except for the first
+"   Tabularize ------------------------------------------------------------- {{{
 
-" al quickly opens for aligning on an inputted value, the others are shorthands
-" for pre-programmed alignments on the first of the given token
-" Note: To edit these Tabularize functions, or create new ones, open up the
-" Tabs.vim file under TODO
-nnoremap <leader>al  :Tabular /\v/l1c1<left><left><left><left><left>
-vnoremap <leader>al  :Tabular /\v
-nnoremap <leader>fq  :Tabular first_quote<cr>
-vnoremap <leader>fq  :Tabular first_quote<cr>
-nnoremap <leader>fa  :Tabular first_apost<cr>
-vnoremap <leader>fa  :Tabular first_apost<cr>
-nnoremap <leader>fbl :Tabular first_block<cr>
-vnoremap <leader>fbl :Tabular first_block<cr>
-nnoremap <leader>fp  :Tabular first_paren<cr>
-vnoremap <leader>fp  :Tabular first_paren<cr>
-nnoremap <leader>fbr :Tabular first_bracket<cr>
-vnoremap <leader>fbr :Tabular first_bracket<cr>
-nnoremap <leader>fc  :Tabular first_colon<cr>
-vnoremap <leader>fc  :Tabular first_colon<cr>
-nnoremap <leader>fs  :Tabular first_slash<cr>
-vnoremap <leader>fs  :Tabular first_slash<cr>
-nnoremap <leader>fbs :Tabular first_back_slash<cr>
-vnoremap <leader>fbs :Tabular first_back_slash<cr>
-" built in tabular bindings
-nnoremap <leader>as  :Tabular assignment<cr>
-vnoremap <leader>as  :Tabular assignment<cr>
-nnoremap <leader>sp  :Tabular two_spaces<cr>
-vnoremap <leader>sp  :Tabular two_spaces<cr>
-nnoremap <leader>ms  :Tabular multiple_spaces<cr>
-vnoremap <leader>ms  :Tabular multiple_spaces<cr>
-nnoremap <leader>li  :Tabular argument_list<cr>
-vnoremap <leader>li  :Tabular argument_list<cr>
+" TODO create named assignments from the ones we use the most
+
+" <leader>al mnemonic is "align"
+nnoremap <leader>al :Tabularize /
+vnoremap <leader>al :Tabularize /
+
+" <leader>at mnemonic is "align to"
+nnoremap <leader>at yl:Tabularize /<C-r>"<cr>
+vnoremap <leader>at y:Tabularize /<C-r>"<cr>
 
 "   }}}
 "   UltiSnips -------------------------------------------------------------- {{{
-" TODO evaluate
-
-" Open the edit snippet window in a vertical split
+" Edit in vertical windows
 let g:UltiSnipsEditSplit="vertical"
 
-" Where to save my created snippets
+" where to save my custom created snippets
 let g:UltiSnipsSnippetDir="~/.vim/UltiSnips"
 
-" Set the trigger to c-space
-let g:UltiSnipsExpandTrigger="<leader>f"
+" Don't allow using snipmate definition files, clobbers duplicate completions
+let g:UltiSnipsEnableSnipMate = 0
+
+" override some settings that ulitsnips mashes
+let g:UltiSnipsExpandTrigger="<C-e>"
+let g:UltiSnipsJumpForwardTrigger="<C-m>"
+let g:UltiSnipsJumpBackwardTrigger="<C-b>"
 
 " The exclamation mark is important, otherwise edit defaults to the first,
 " although this isn't usally the one we want to edit
 nnoremap <leader>snip :UltiSnipsEdit!<cr>
 
 "   }}}
-"   StatusLine ------------------------------------------------------------- {{{
-" TODO evaluate
-
-set statusline=
-set statusline+=%-3.3n\                                            "buffer nr
-set statusline+=%f\                                                "file name
-set statusline+=%h%m%r%w                                           "flags
-set statusline+=[%{strlen(&ft)?&ft:'none'},                        "filetype
-set statusline+=%{strlen(&fenc)?&fenc:&enc},                       "encoding
-set statusline+=%{&fileformat}]                                    "file format
-set statusline+=%=                                                 "right align
-set statusline+=%{synIDattr(synID(line('.'),col('.'),1),'name')}\  "highlight
-set statusline+=%b,0x%-8B\                                         "current char
-set statusline+=%-14.(%l,%c%V%)\%P                                 "offset
-
-"   }}}
 "   YouCompleteMe ---------------------------------------------------------- {{{
 " TODO evaluate
 
-let g:ycm_collect_identifiers_from_tags_files = 1      "use tags files
-let g:ycm_autoclose_preview_window_after_insertion = 1 "leave window open until we leave insert
-let g:ycm_seed_identifiers_with_syntax = 1             "seed ycm completions
-let g:ycm_confirm_extra_conf = 0                       "stop asking if I want to use or not
-let g:ycm_goto_buffer_command = 'vertical-split'       "open in v-split
-" let g:ycm_auto_trigger = 0                             " don't use automatic complete, too slow
-let g:ycm_key_invoke_completion = '<S-Space>'
-let g:ycm_server_log_level = 'debug'
-
-"   }}}
-"   CompiledbPath ---------------------------------------------------------- {{{
-" TODO evaluate
-
-augroup add_paths
-    autocmd!
-    " allows 'gf' file traversal from compile_commands.json
-    autocmd VimEnter * :CompileDbPathIfExists compile_commands.json
-augroup END
+let g:ycm_collect_identifiers_from_tags_files = 1      " use tags files
+let g:ycm_autoclose_preview_window_after_insertion = 1 " leave window open until we leave insert
+let g:ycm_seed_identifiers_with_syntax = 1             " seed ycm completions
+let g:ycm_confirm_extra_conf = 0                       " stop asking if I want to use or not
+let g:ycm_goto_buffer_command = 'vertical-split'       " open in v-split
+" let g:ycm_auto_trigger = 0                           " Disable if completions are slow
+let g:ycm_key_invoke_completion = '<S-Space>'          " map the manual trigger
+let g:ycm_server_log_level = 'debug'                   " gives more info in the logs
 
 "   }}}
 "   Airline ---------------------------------------------------------------- {{{
-" TODO evaluate
 
-let g:airline_powerline_fonts=1
-
-if !exists('g:airline_symbols')
-    let g:airline_symbols = {}
-endif
-
-" powerline symbols
-let g:airline_left_sep = '»'
-let g:airline_left_sep = '▶'
-let g:airline_right_sep = '«'
-let g:airline_right_sep = '◀'
-let g:airline_symbols.crypt = '🔒'
-let g:airline_symbols.linenr = '␊'
-let g:airline_symbols.linenr = '␤'
-let g:airline_symbols.linenr = '¶'
-let g:airline_symbols.branch = '⎇'
-let g:airline_symbols.paste = 'ρ'
-let g:airline_symbols.paste = 'Þ'
-let g:airline_symbols.paste = '∥'
-let g:airline_symbols.whitespace = 'Ξ'
+let g:airline_powerline_fonts=1 " this depends on OS font configuration
 
 "   }}}
 "   CamelCaseMotion -------------------------------------------------------- {{{
-" TODO evaluate
 
-" call camelcasemotion#CreateMotionMappings('<leader>')
+" This works well enough for now, might change it if too many conflicts arise
+call camelcasemotion#CreateMotionMappings('<localleader>')
+
+"   }}}
+"   Command-T -------------------------------------------------------------- {{{
+
+let g:CommandTMaxHeight=0          " maximize window size
+let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
+let g:CommandTScanDotDirectories=1 " scan dot-directories too
 
 "   }}}
 " }}}
@@ -751,6 +665,8 @@ augroup FileType_c_cpp
    " add the gtest ultisnips settings for cpp files
    au FileType c,cpp UltiSnipsAddFiletypes gtest
 
+   au FileType c,cpp setlocal textwidth=120
+
 augroup END
 "   }}}
 "   Make ------------------------------------------------------------------- {{{
@@ -782,6 +698,9 @@ augroup FileType_vim
     "
     " The only caveat is we also have to source the file ourselves here
     au SourceCmd * source <afile> | setlocal ft=vim
+
+    " Make opening from quickfixwindow into a vertical split easier
+    au FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L
 
 augroup END
 "   }}}
@@ -976,8 +895,9 @@ hi def BlockColor4 guibg=#3d3d3d ctermbg=237
 hi def BlockColor5 guibg=#444444 ctermbg=238
 hi def BlockColor6 guibg=#4a4a4a ctermbg=239
 
+"TODO this needs to be remapped, interferes with camelcasemotion
 " <leader>b toggles block highlighting on or off
-nnoremap <leader>b :call BlockColor()<cr>
+"nnoremap <leader>b :call BlockColor()<cr>
 
 "       }}}
 "       Highlight Word ----------------------------------------------------- {{{

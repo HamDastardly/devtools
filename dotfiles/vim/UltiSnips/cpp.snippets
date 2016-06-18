@@ -1,0 +1,18 @@
+# We want to overwrite everything in parent ft.
+priority -50
+extends c
+priority -49
+
+snippet inc "include local header" b
+#include "${1:`!p snip.rv = snip.basename+".hpp"`}"
+endsnippet
+
+snippet Inc "include system header" b
+#include <${1:iostream}>
+endsnippet
+
+snippet wh "while loop" w
+while(${1:condition}) {
+	$0
+}
+endsnippet

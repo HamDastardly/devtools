@@ -1,7 +1,11 @@
 # We want to overwrite everything in parent ft.
 priority -50
 extends c
-priority -49
+
+priority -40
+extends gtest
+
+priority -30
 
 snippet inc "include local header" b
 #include "${1:`!p snip.rv = snip.basename+".hpp"`}"
@@ -12,7 +16,85 @@ snippet Inc "include system header" b
 endsnippet
 
 snippet wh "while loop" w
-while(${1:condition}) {
-	$0
+while (${1:condition}) {
+	${VISUAL}
 }
+endsnippet
+
+snippet cout "stdout stream" w
+std::cout << ${1:${VISUAL}} << std::endl;
+endsnippet
+
+snippet cerr "stderr stream" w
+std::cerr << ${VISUAL} << std::endl;
+endsnippet
+
+snippet clog "stdlog stream" w
+std::clog << ${VISUAL} << std::endl;
+endsnippet
+
+snippet if "if statement" b
+if (${1:true}) {
+	${2:${VISUAL}}
+}
+endsnippet
+
+snippet elif "else if .. (eli)"
+else if (${1:/* condition */}) {
+	${VISUAL}$0
+}
+endsnippet
+
+snippet else "else statement" w
+else {
+	${VISUAL}$0
+}
+endsnippet
+
+snippet once "Header Include Guard" b
+#pragma once
+endsnippet
+
+snippet fore "For Each" b
+for(${3:auto} ${1:x} : ${2:y}) {
+	${4:${VISUAL}}
+}
+endsnippet
+
+snippet "((\w+)\.)?bend" "$1.begin(), $1.end()" rw
+${1:`!p snip.rv = match.group(2) if match.group(1) is not None else "vector"`}.begin(), $1.end()
+endsnippet
+
+snippet dc "Doxygen Comment" b
+/** \brief $0 */
+endsnippet
+
+snippet "p(i|o|io)?" "Doxygen parameter[in,out]" rw
+\param`!p
+if match.group(1) is None:
+	snip.rv = ""
+elif "i" == match.group(1):
+	snip.rv = "[in]"
+elif "o" ==match.group(1):
+	snip.rv = "[out]"
+elif "io" == match.group(1):
+	snip.rv = "[in,out]"` $0
+endsnippet
+
+snippet r "Doxygen return" w
+\return $0
+endsnippet
+
+snippet sw "Switch Statement" w
+switch (${1:condition}) {
+$0
+default:
+	break;
+}
+endsnippet
+
+snippet ca "Case Statement" w
+case ${1:match_case}:
+	$0
+	break;
 endsnippet

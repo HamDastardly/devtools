@@ -26,13 +26,19 @@ Plugin 'VundleVim/Vundle.vim' " Required for Vundle Bootstrap
 Plugin 'scrooloose/nerdtree'
 Plugin 'wincent/command-t'
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'Valloric/ListToggle'
 Plugin 'tpope/vim-surround'
 Plugin 'bkad/CamelCaseMotion'
-Plugin 'vim-airline/vim-airline'
 Plugin 'godlygeek/tabular'
 Plugin 'altercation/vim-colors-solarized'
 Plugin 'honza/vim-snippets'
 Plugin 'tpope/vim-abolish'
+Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-commentary'
+Plugin 'brookhong/cscope.vim'
+Plugin 'tommcdo/vim-exchange'
+Plugin 'vim-airline/vim-airline' " this should always be last
+
 
 " master is broken, managing stable releases manually
 Plugin 'SirVer/ultisnips', {'pinned': 1}
@@ -92,7 +98,7 @@ set hidden                     "hide buffers, don't abandon them
 set visualbell t_vb=           "turn off visual and sound bell
 set ttyfast                    "improve screen redrawing
 set undofile                   "save undo history to file
-set lazyredraw                 "save some computational power
+set nolazyredraw               "save some computational power
 set splitbelow                 "default split behavior
 set splitright                 "default split behavior
 set autoread                   "reread files that changed outside vim
@@ -115,6 +121,7 @@ set foldmethod=syntax          "use syntax folding by default
 set number                     "enable line numbers by default
 set listchars=tab:>-,trail:^
 set encoding=utf-8
+set diffopt=filler,vertical
 
 "   }}}
 "   StatusLine ------------------------------------------------------------- {{{
@@ -153,7 +160,7 @@ set textwidth=80
 " Code is never formatted for us, comments are automatically wrapped at tw
 " opening a new line from a comment leaves us in the comment
 " apply special rules for lists (alpha lists not supported, fe. a) or B.)
-set formatoptions=
+set formatoptions&vim
 set formatoptions-=t " Don't wrap code automatically (trigger: 'normal! gq')
 set formatoptions+=c " Wrap comments to textwidth, insert comment leader
 set formatoptions+=r " <Enter> continues comment on next line
@@ -173,13 +180,28 @@ set formatoptions+=1 " Prefer breaking a line before a 1 letter word
 set formatoptions+=j " remove comment leader when joining lines
 
 " Regex to recognize lists, and apply better formatting
-" Format \v^\s*[0-9a-zA-Z+-*]+[:.)}\]]*\s+
 "   <line start>
 "   <0 or more <whitespace>>
-"   <1 or more <alphanumeric or +-*>>
-"   <0 or 1 <:.)}]>>
-"   <1 or more <whitespace>>
-let &formatlistpat='\v^\s*[0-9a-zA-z+-*]+[:.)}\]]?\s+'
+"   <either
+"       <one or more <-+*>> or
+"       <one or more
+"           <either
+"               <one or more <digit>> or
+"               <one or more <alpha>>
+"           > then one of <:.)}]>
+"       >
+"   >
+"
+" Valid Lists         | Invalid lists
+" * star              | 5.1 (missing terminating separator)
+" ** star-star        |
+" - dash              |
+" + cross             |
+" 4. four             |
+" A) letter eh        |
+" 5.1: five-point-one |
+" A.2] eh-dot-2       |
+set formatlistpat=\\v^\\s*((([0-9]+\|[a-zA-Z]+)[:.)}\\]])+\|[-+*]+)\\s+
 
 "       }}}
 "       CIndentation Options ----------------------------------------------- {{{
@@ -193,7 +215,7 @@ function! SetCInOptions() " {{{
     " set cinoptions=f  " no extra indent for first opening brace in a block
     " set cinoptions={  " no extra indent for opening braces
     " set cinoptions=}  " no extra indent for closing braces
-    " set cinoptions=^  " no extra indent for outermost block
+    set cinoptions+=^0  " no extra indent for outermost block
     set cinoptions+=L0  " keep jump statements at the same indent as surroundings
     set cinoptions+=:0  " keep case label indentation with switch() statement
     " set cinoptions==  " no extra indent for statements following ^^^
@@ -239,8 +261,7 @@ function! SetCInOptions() " {{{
     endfor
 endfunction " }}}
 
-" Enable cindent, and set the rules for indentation evaluation
-set cindent
+" Cindent gets configured here, and enabled in the autocommand groups for c/cpp
 call SetCInOptions()
 
 " only use 1 space after a punctuation mark {.?!}
@@ -386,9 +407,9 @@ noremap! <A-k> <up>
 " <leader>c puts { on a new line, and }; on a new line
 " <leader>f puts { on a new line, and } on a new line
 " <leader>e puts { at the end of this line, and } on a new line
-" nnoremap <leader>c o{<CR>};<C-o>O
-" nnoremap <leader>f o{<CR>}<C-o>O
-" nnoremap <silent> <leader>e :call StripTrailingWhitespaces()<cr>A {<CR>}<C-o>O
+nnoremap <silent> <localleader>c :call StripTrailingWhitespaces()<CR>o{<CR>};<C-o>O
+nnoremap <silent> <localleader>f :call StripTrailingWhitespaces()<CR>o{<CR>}<C-o>O
+nnoremap <silent> <localleader>d :call StripTrailingWhitespaces()<CR>A {<CR>}<C-o>O
 
 " use a double ';' to end the line
 nnoremap ;; A;<esc>
@@ -434,15 +455,9 @@ endfunction " }}}
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
 
-" convenient for using the YCM engine to jump around to declarations/definitions
-" TODO move to YCM configurations
-nnoremap <silent> <leader>dl :YcmCompleter GoToDeclaration<cr>
-nnoremap <silent> <leader>df :YcmCompleter GoToDefinition<cr>
-nnoremap <silent> <leader>go :YcmCompleter GoTo<cr>
-
 "   }}}
 "   Folding ---------------------------------------------------------------- {{{
-set foldlevelstart=0 " start with 1st level folds open
+set foldlevelstart=1 " start with 1st level folds open
 
 " Space to toggle folds.
 nnoremap <Space> za
@@ -528,7 +543,7 @@ function! GtestFixtureName() " {{{
     let b:UltiSnips_GtestFixtureName = GetVisualSelection()
 endfunction " }}}
 
-vnoremap <silent> <leader>set :call GtestFixtureName()<cr>
+vnoremap <silent> <localleader>f :call GtestFixtureName()<cr>
 
 "   }}}
 " }}}
@@ -556,11 +571,7 @@ nnoremap <c-f> :NERDTreeFind<cr>
 
 " <leader>al mnemonic is "align"
 nnoremap <leader>al :Tabularize /
-vnoremap <leader>al :Tabularize /
-
-" <leader>at mnemonic is "align to"
-nnoremap <leader>at yl:Tabularize /<C-r>"<cr>
-vnoremap <leader>at y:Tabularize /<C-r>"<cr>
+vnoremap <leader>al y:Tabularize /<C-r>"<cr>
 
 "   }}}
 "   UltiSnips -------------------------------------------------------------- {{{
@@ -575,8 +586,8 @@ let g:UltiSnipsEnableSnipMate = 0
 
 " override some settings that ulitsnips mashes
 let g:UltiSnipsExpandTrigger="<C-e>"
-let g:UltiSnipsJumpForwardTrigger="<C-m>"
-let g:UltiSnipsJumpBackwardTrigger="<C-b>"
+let g:UltiSnipsJumpForwardTrigger="<C-j>"
+let g:UltiSnipsJumpBackwardTrigger="<C-k>"
 
 " The exclamation mark is important, otherwise edit defaults to the first,
 " although this isn't usally the one we want to edit
@@ -586,21 +597,25 @@ nnoremap <leader>snip :UltiSnipsEdit!<cr>
 "   YouCompleteMe ---------------------------------------------------------- {{{
 " TODO evaluate
 
-let g:ycm_collect_identifiers_from_tags_files = 1      " use tags files
-let g:ycm_autoclose_preview_window_after_insertion = 1 " leave window open until we leave insert
-let g:ycm_seed_identifiers_with_syntax = 1             " seed ycm completions
-let g:ycm_confirm_extra_conf = 0                       " stop asking if I want to use or not
-let g:ycm_goto_buffer_command = 'vertical-split'       " open in v-split
-" let g:ycm_auto_trigger = 0                           " Disable if completions are slow
-let g:ycm_key_invoke_completion = '<S-Space>'          " map the manual trigger
-let g:ycm_server_log_level = 'debug'                   " gives more info in the logs
+let g:ycm_collect_identifiers_from_tags_files = 1       " use tags files
+let g:ycm_autoclose_preview_window_after_insertion = 1  " leave window open until we leave insert
+let g:ycm_autoclose_preview_window_after_completion = 1 " leave window open until we leave insert
+let g:ycm_seed_identifiers_with_syntax = 1              " seed ycm completions
+let g:ycm_confirm_extra_conf = 0                        " stop asking if I want to use or not
+let g:ycm_goto_buffer_command = 'vertical-split'        " open in v-split
+" let g:ycm_auto_trigger = 0                            " Disable if completions are slow
+let g:ycm_key_invoke_completion = '<C-Space>'           " map the manual trigger
+let g:ycm_server_log_level = 'debug'                    " gives more info in the logs
+
+" convenient for using the YCM engine to jump around to declarations/definitions
+" TODO move to YCM configurations
+nnoremap <silent> <leader>go :YcmCompleter GoTo<cr>
+nnoremap <silent> <leader>fi :YcmCompleter FixIt<cr>
+nnoremap <silent> <leader>do :YcmCompleter GetDoc<cr>
+nnoremap <silent> <leader>au :YcmCompleter GetType<cr>
 
 "   }}}
-"   Airline ---------------------------------------------------------------- {{{
 
-let g:airline_powerline_fonts=1 " this depends on OS font configuration
-
-"   }}}
 "   CamelCaseMotion -------------------------------------------------------- {{{
 
 " This works well enough for now, might change it if too many conflicts arise
@@ -614,8 +629,30 @@ let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
 let g:CommandTScanDotDirectories=1 " scan dot-directories too
 
 "   }}}
+"   CScope ----------------------------------------------------------------- {{{
+
+nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
+vnoremap <leader>fa y:call CscopeFindInteractive(<C-r>")<CR>
+
+let g:cscope_silent = 1 " don't remind me every time it updates
+
+"   }}}
+"   ListToggle ------------------------------------------------------------- {{{
+
+let g:lt_location_list_toggle_map = '<leader>l'
+let g:lt_quickfix_list_toggle_map = '<leader>m'
+
+"   }}}
 " }}}
 " AutoCommand Groups ------------------------------------------------------- {{{
+"   Aside on Autocommand Triggers ------------------------------------------ {{{
+"   setlocal cannot be used with FileType, since FileType is only set when a new
+"   buffer is opened in a window, but the local options are initialized from the
+"   global settings when a new window is created. Therefore, setlocal is not
+"   called when opening the window the first time. Instead, use
+"   BufRead,BufNewFile for local options, or trigger the filetype setting from
+"   within the augroup after the window is created.
+"   }}}
 "   Common AutoGroup Commands ---------------------------------------------- {{{
 augroup ALL
   autocmd!
@@ -632,14 +669,14 @@ augroup ALL
   au BufEnter,BufWritePre,BufLeave * silent! call StripTrailingWhitespaces()
 
   " If we made changes to the file, save them before switching buffers
-  au BufLeave * silent! update
+  au BufLeave,FocusLost * silent! update
 
   " Refresh the current buffer when we navigate to it or enter insert mode
   " if we have modify permissions
   au BufEnter,InsertEnter * if &modifiable | execute "checktime" @% | endif
 
   " Resize splits when the window is resized
-  au VimResized * wincmd =
+  au VimResized * if &modifiable | wincmd = | endif
 
   " Show trailing characters iff not in insert mode
   " The char here should match the one set in listchars above
@@ -659,13 +696,51 @@ augroup end
 augroup FileType_c_cpp
    autocmd!
 
-   " treat .pde as cpp files
-   au BufRead,BufNewFile *.pde set filetype=cpp
+   " Trigger the local options when we create a new window
+   au BufRead,BufNewFile *.cpp,*.hpp,*.inl setlocal ft=cpp
 
-   " add the gtest ultisnips settings for cpp files
-   au FileType c,cpp UltiSnipsAddFiletypes gtest
+   " Enable cindent rules for c/cpp files
+   " formatlistpat is overwritten to remove the '*' identifier, which is
+   "    ambiguous with multiline comment markers
+   au FileType cpp setlocal cindent
+   au FileType cpp setlocal formatlistpat=\\v^\\s*[*]+\\zs\\s*((([0-9]+\|[a-zA-Z]+)[:.)}\\]])+\|[-+*]+)\\s+
 
-   au FileType c,cpp setlocal textwidth=120
+   " Set the textwidth
+   au FileType cpp setlocal textwidth=100
+
+"    " Shooty Face Temp
+"    " Run unit tests for the file being edited
+"    au FileType cpp
+"                \ nnoremap <buffer> <localleader>g
+"                \ :!cd build && make -j8 shooty_face && bin/shooty_face<cr>
+
+   " Run unit tests for the file being edited
+   au FileType cpp
+               \ nnoremap <buffer> <localleader>r
+               \ :!cd build && make %:t:r && bin/utests/%:t:r<cr>
+
+   " Blu Temp
+   " Run the executable
+   au FileType c
+               \ nnoremap <buffer> <localleader>r
+               \ :!cd build && make -j8 blu && bin/blu<cr>
+
+   " Run the unit test
+   au FileType cpp
+               \ nnoremap <buffer> <localleader>g
+               \ :!cd build && make %:t:r && bin/tests/%:t:r<cr>
+
+
+   " gtest doesn't show up in the list, due to the setlocal option above
+   " however, it still gives me access to the shortcuts
+   " to edit, use ':UltiSnipsEdit gtest' manually
+   au BufNew,BufRead *.cpp :UltiSnipsAddFiletypes gtest
+
+augroup END
+"   }}}
+"   Test Space ------------------------------------------------------------- {{{
+augroup TestSpace
+   autocmd!
 
 augroup END
 "   }}}
@@ -673,12 +748,10 @@ augroup END
 augroup FileType_make
    autocmd!
 
-   " insert 3 spaces for tab, columnize everything to multiples of 3 spaces
+   au BufRead,BufNewFile makefile,Makefile,MAKEFILE setlocal ft=make
+
+   " Makefiles are sensitive to spacing settings
    au FileType make setlocal
-               \ tabstop=8
-               \ shiftwidth=8
-               \ shiftround
-               \ softtabstop=8
                \ noexpandtab
                \ textwidth=80
 
@@ -688,7 +761,10 @@ augroup END
 augroup FileType_vim
     autocmd!
 
-    " Enable folding in this vimrc file
+    " Trigger the local options when we create a new window
+    au BufRead,BufNewFile vimrc setlocal ft=vim
+
+    au FileType vim setlocal textwidth=80
     au FileType vim setlocal foldmethod=marker
 
     " When we source this file, we lose file settings, because we've cleared the
@@ -697,10 +773,12 @@ augroup FileType_vim
     " We can fix this by consuming the SourceCmd event, then setting the ft
     "
     " The only caveat is we also have to source the file ourselves here
-    au SourceCmd * source <afile> | setlocal ft=vim
+    au SourceCmd * let b:ft=&ft | source <afile> | let &ft=b:ft
 
-    " Make opening from quickfixwindow into a vertical split easier
-    au FileType qf nnoremap <buffer> <C-v> <C-w><Enter><C-w>L
+    " use <C-v> in quickfix to open in split
+    au FileType qf nnoremap <buffer> <C-v>
+                \ <C-w><Enter><C-w>L
+                \:cclose<CR>:copen<CR>
 
 augroup END
 "   }}}
@@ -805,7 +883,7 @@ function! s:NextTextObject(motion, dir) " {{{
 
         " Then we'll find it's matching end delimiter.
         if c ==# "'" || c ==# '"'
-            " searchpairpos() doesn't work for quotes, because fuck me.
+            " searchpairpos() doesn't work for quotes, because $@#! me.
             let end_pos = searchpos(open)
         else
             let end_pos = searchpairpos(open, '', close)

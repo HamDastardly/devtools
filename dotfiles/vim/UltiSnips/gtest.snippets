@@ -1,0 +1,110 @@
+snippet tf "TEST_F" b
+TEST_F(${1:`!p snip.rv = snip.opt('b:UltiSnips_GtestFixtureName', 'FixtureName')`}, ${2:Description})
+{
+	$0
+}
+endsnippet
+
+global !p
+def extract_prefix(option):
+	if 'e' == option:
+		return "EXPECT"
+	elif 'a' == option:
+		return "ASSERT"
+	else:
+		return "EXPECT"
+
+def extract_float(option):
+	if 'f' == option:
+		return "_FLOAT_"
+	elif 'd' == option:
+		return "_DOUBLE_"
+	else:
+		return "_"
+
+def extract_case(option):
+	if 'c' == option:
+		return "CASE"
+	else:
+		return ""
+
+def make_assertion(option, float, val):
+	return extract_prefix(option) + extract_float(float) + val
+
+def make_string_assertion(option, case, val):
+	return extract_prefix(option) + "_STR" + extract_case(case) + val
+
+endglobal
+
+# EXPECT/ASSERT generators
+# 'a' == assert, 'e' == expect, '' == expect
+# verb matches gtest (true == true, eq == eq, etc)
+# for strings, use seq or sne, case insensitive is seqc or snec
+
+snippet "(a|e)?true" "True" rb
+`!p snip.rv = make_assertion(match.group(1), None, "TRUE")`(${1:${VISUAL:true_value}});
+endsnippet
+
+snippet "(a|e)?false" "False" rb
+`!p snip.rv = make_assertion(match.group(1), None, "FALSE")`(${1:${VISUAL:false_value}});
+endsnippet
+
+snippet "(a|e)?(f|d)?eq" "Equal" rb
+`!p snip.rv = make_assertion(match.group(1), match.group(2), "EQ")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet "(a|e)?ne" "Not Equal" rb
+`!p snip.rv = make_assertion(match.group(1), None, "NE")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet "(a|e)?lt" "Less Than" rb
+`!p snip.rv = make_assertion(match.group(1), None, "LT")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet "(a|e)?le" "Less Than or Equal" rb
+`!p snip.rv = make_assertion(match.group(1), None, "LE")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet "(a|e)?gt" "Greater Than" rb
+`!p snip.rv = make_assertion(match.group(1), None, "GT")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet "(a|e)?ge" "Greater Than or Equal" rb
+`!p snip.rv = make_assertion(match.group(1), None, "GE")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet "(a|e)?seq(c)?" "C String Equal" rb
+`!p snip.rv = make_string_assertion(match.group(1), match.group(2), "EQ")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet "(a|e)?sne(c)?" "C String Equal" rb
+`!p snip.rv = make_string_assertion(match.group(1), match.group(2), "NE")`(${1:${VISUAL:expected}}, ${2:${VISUAL:actual}});
+endsnippet
+
+snippet ecall "EXPECT_CALL" b
+EXPECT_CALL(${1:mock_object}, ${2:method}(${3:argument_matchers}))$0
+endsnippet
+
+snippet ocall "On_CALL" b
+ON_CALL(${1:mock_object}, ${2:method}(${3:argument_matchers}))$0
+endsnippet
+
+snippet wo ".WillOnce(action)" w
+.WillOnce(${1:action})$0
+endsnippet
+
+snippet wr ".WillRepeatedly(action)" w
+.WillRepeatedly(${1:action})$0
+endsnippet
+
+snippet wbd ".WillByDefault(action)" w
+.WillByDefault(${1:action})$0
+endsnippet
+
+snippet times ".Times(cardinality)" w
+.Times(${1:cardinality})$0
+endsnippet
+
+snippet ret "Return(value)" w
+Return(${1:value})$0
+endsnippet

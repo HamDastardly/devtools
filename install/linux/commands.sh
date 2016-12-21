@@ -15,5 +15,6 @@ UPDATE_ALTS="sudo update-alternatives"
 
 GIT_CLONE="git clone"
 GIT_CONFIG="git config"
+GIT_CHECKOUT="git checkout"
 
 LINK="ln -s"

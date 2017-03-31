@@ -1,5 +1,4 @@
 ./setup.sh
-./solarized.sh
-./git.sh
+#./solarized.sh
 ./vim.sh
-./llvm.sh
+#./fonts.sh

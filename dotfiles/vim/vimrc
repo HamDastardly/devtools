@@ -41,7 +41,7 @@ Plugin 'vim-airline/vim-airline' " this should always be last
 
 
 " master is broken, managing stable releases manually
-Plugin 'SirVer/ultisnips', {'pinned': 1}
+Plugin 'SirVer/ultisnips'
 call vundle#end()
 
 " Required after adding plugins
@@ -363,8 +363,7 @@ nnoremap / /\v
 " wsb yanks the visual selection, and wraps it in word-delimiters
 " sb is like wsb, but without word delimiters
 " sb in normal mode brings up a blank substitution pattern
-vnoremap <leader>wsb y:%s:\v(<<C-r>0>)::gc<left><left><left>
-vnoremap <leader>sb  y:%s:\v(<C-r>0)::gc<left><left><left>
+vnoremap <leader>sb  y:%s:\v(<C-r>0)\C::gc<left><left><left>
 nnoremap <leader>sb  :%s:\v::gc<left><left><left><left>
 
 "   }}}
@@ -407,8 +406,8 @@ noremap! <A-k> <up>
 " <leader>c puts { on a new line, and }; on a new line
 " <leader>f puts { on a new line, and } on a new line
 " <leader>e puts { at the end of this line, and } on a new line
-nnoremap <silent> <localleader>c :call StripTrailingWhitespaces()<CR>o{<CR>};<C-o>O
-nnoremap <silent> <localleader>f :call StripTrailingWhitespaces()<CR>o{<CR>}<C-o>O
+nnoremap <silent> <localleader>c :call StripTrailingWhitespaces()<CR>A {<CR>};<C-o>O
+nnoremap <silent> <localleader>f :call StripTrailingWhitespaces()<CR>A {<CR>}<C-o>O
 nnoremap <silent> <localleader>d :call StripTrailingWhitespaces()<CR>A {<CR>}<C-o>O
 
 " use a double ';' to end the line
@@ -522,7 +521,7 @@ function! RegenerateTags() " {{{
     redraw!
 endfunction " }}}
 
-nnoremap <silent> <localleader>t :call RegenerateTags()<CR>
+" nnoremap <silent> <localleader>t :call RegenerateTags()<CR>
 
 "   }}}
 "   GTest -----------------------------------------------------------------  {{{
@@ -634,6 +633,9 @@ let g:CommandTScanDotDirectories=1 " scan dot-directories too
 nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
 vnoremap <leader>fa y:call CscopeFindInteractive(<C-r>")<CR>
 
+nnoremap <silent> <localleader>] :lnext<cr>
+nnoremap <silent> <localleader>[ :lprev<cr>
+
 let g:cscope_silent = 1 " don't remind me every time it updates
 
 "   }}}
@@ -706,7 +708,7 @@ augroup FileType_c_cpp
    au FileType cpp setlocal formatlistpat=\\v^\\s*[*]+\\zs\\s*((([0-9]+\|[a-zA-Z]+)[:.)}\\]])+\|[-+*]+)\\s+
 
    " Set the textwidth
-   au FileType cpp setlocal textwidth=100
+   au FileType cpp setlocal textwidth=80
 
 "    " Shooty Face Temp
 "    " Run unit tests for the file being edited
@@ -717,19 +719,20 @@ augroup FileType_c_cpp
    " Run unit tests for the file being edited
    au FileType cpp
                \ nnoremap <buffer> <localleader>r
-               \ :!cd build && make %:t:r && bin/utests/%:t:r<cr>
-
-   " Blu Temp
-   " Run the executable
-   au FileType c
-               \ nnoremap <buffer> <localleader>r
-               \ :!cd build && make -j8 blu && bin/blu<cr>
-
-   " Run the unit test
+               \ :!scripts/run_tests.sh -R %:t:r<cr>
    au FileType cpp
-               \ nnoremap <buffer> <localleader>g
-               \ :!cd build && make %:t:r && bin/tests/%:t:r<cr>
+               \ nnoremap <buffer> <localleader>R
+               \ :!scripts/run_tests.sh -R %:t:r -V<cr>
 
+   au FileType cpp
+               \ nnoremap <buffer> <localleader>t
+               \ :!scripts/build_image.sh -DBUILD=Debug
+               \ && cp build/bin/G4_flobox.hex ~/host_shared<cr>
+
+   au FileType cpp
+               \ nnoremap <buffer> <localleader>T
+               \ :!scripts/build_image.sh -DBUILD=Release
+               \ && cp build/bin/G4_flobox.hex ~/host_shared<cr>
 
    " gtest doesn't show up in the list, due to the setlocal option above
    " however, it still gives me access to the shortcuts
@@ -975,7 +978,7 @@ hi def BlockColor6 guibg=#4a4a4a ctermbg=239
 
 "TODO this needs to be remapped, interferes with camelcasemotion
 " <leader>b toggles block highlighting on or off
-"nnoremap <leader>b :call BlockColor()<cr>
+nnoremap <leader>b :call BlockColor()<cr>
 
 "       }}}
 "       Highlight Word ----------------------------------------------------- {{{

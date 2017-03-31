@@ -1,4 +1,4 @@
 set -x -e
 
-$APT_SANITIZE
-$APT_INSTALL git
+sudo $APT_SANITIZE
+sudo $APT_INSTALL git

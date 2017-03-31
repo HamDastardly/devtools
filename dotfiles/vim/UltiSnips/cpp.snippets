@@ -61,6 +61,12 @@ for(${3:auto} ${1:x} : ${2:y}) {
 }
 endsnippet
 
+snippet for "For Loop" b
+for(int ${1:ndx} = 0; $1 < ${2:limit}; ++$1) {
+	${3:${VISUAL}}
+}
+endsnippet
+
 snippet "((\w+)\.)?bend" "$1.begin(), $1.end()" rw
 ${1:`!p snip.rv = match.group(2) if match.group(1) is not None else "vector"`}.begin(), $1.end()
 endsnippet
@@ -97,4 +103,24 @@ snippet ca "Case Statement" w
 case ${1:match_case}:
 	$0
 	break;
+endsnippet
+
+snippet cg "CPP Guard Begin" b
+#ifdef __cplusplus
+extern "C" {
+#endif
+endsnippet
+
+snippet ce "CPP Guard End" b
+#ifdef __cplusplus
+}
+#endif
+endsnippet
+
+snippet ns "namespace" b
+namespace ${1:namespace} {
+
+$0
+
+} // namespace $1
 endsnippet

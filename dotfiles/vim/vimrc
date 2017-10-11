@@ -37,6 +37,7 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-commentary'
 Plugin 'brookhong/cscope.vim'
 Plugin 'tommcdo/vim-exchange'
+Plugin 'vim-scripts/Conque-GDB'
 Plugin 'vim-airline/vim-airline' " this should always be last
 
 
@@ -118,7 +119,7 @@ set scrolloff=10               "keep at least 10 lines above/below cursor
 set virtualedit=block          "Let block visual go past EOL
 set list                       "show special chars (below)
 set foldmethod=syntax          "use syntax folding by default
-set number                     "enable line numbers by default
+set nonumber                   "disable line numbers by default
 set listchars=tab:>-,trail:^
 set encoding=utf-8
 set diffopt=filler,vertical
@@ -220,7 +221,7 @@ function! SetCInOptions() " {{{
     set cinoptions+=:0  " keep case label indentation with switch() statement
     " set cinoptions==  " no extra indent for statements following ^^^
     set cinoptions+=l1  " align to case label as if it were a {
-    " set cinoptions=b  " align break statement with surrounding inner block
+    set cinoptions=b1   " align break statement with case label
     set cinoptions+=g0  " (public:|private:|protected:) indent to class statement
     " set cinoptions=h  " no extra indent for statements following ^^^
     set cinoptions+=N-s " remove indent following a namespace declaration
@@ -283,6 +284,7 @@ set wildignore+=*.o,*.obj,*.exe,*.dll,*.manifest "compiled object files
 set wildignore+=*.d,*.su                         "dependency files
 set wildignore+=*.spl                            "compiled spelling word lists
 set wildignore+=*.sw?                            "Vim swap files
+set wildignore+=*~                               "Unix temp files
 set wildignore+=*~                               "Unix temp files
 
 "   }}}
@@ -406,9 +408,8 @@ noremap! <A-k> <up>
 " <leader>c puts { on a new line, and }; on a new line
 " <leader>f puts { on a new line, and } on a new line
 " <leader>e puts { at the end of this line, and } on a new line
-nnoremap <silent> <localleader>c :call StripTrailingWhitespaces()<CR>A {<CR>};<C-o>O
-nnoremap <silent> <localleader>f :call StripTrailingWhitespaces()<CR>A {<CR>}<C-o>O
-nnoremap <silent> <localleader>d :call StripTrailingWhitespaces()<CR>A {<CR>}<C-o>O
+nnoremap <silent> <localleader>{ :call StripTrailingWhitespaces()<CR>A {<CR>};<C-o>O
+nnoremap <silent> <localleader>} :call StripTrailingWhitespaces()<CR>A {<CR>}<C-o>O
 
 " use a double ';' to end the line
 nnoremap ;; A;<esc>
@@ -456,7 +457,7 @@ vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
 
 "   }}}
 "   Folding ---------------------------------------------------------------- {{{
-set foldlevelstart=1 " start with 1st level folds open
+set foldlevelstart=99 " start with 1st level folds open
 
 " Space to toggle folds.
 nnoremap <Space> za
@@ -542,7 +543,7 @@ function! GtestFixtureName() " {{{
     let b:UltiSnips_GtestFixtureName = GetVisualSelection()
 endfunction " }}}
 
-vnoremap <silent> <localleader>f :call GtestFixtureName()<cr>
+vnoremap <silent> <localleader>gt :call GtestFixtureName()<cr>
 
 "   }}}
 " }}}
@@ -598,7 +599,7 @@ nnoremap <leader>snip :UltiSnipsEdit!<cr>
 
 let g:ycm_collect_identifiers_from_tags_files = 1       " use tags files
 let g:ycm_autoclose_preview_window_after_insertion = 1  " leave window open until we leave insert
-let g:ycm_autoclose_preview_window_after_completion = 1 " leave window open until we leave insert
+" let g:ycm_autoclose_preview_window_after_completion = 1 " leave window open until we leave insert
 let g:ycm_seed_identifiers_with_syntax = 1              " seed ycm completions
 let g:ycm_confirm_extra_conf = 0                        " stop asking if I want to use or not
 let g:ycm_goto_buffer_command = 'vertical-split'        " open in v-split
@@ -614,7 +615,6 @@ nnoremap <silent> <leader>do :YcmCompleter GetDoc<cr>
 nnoremap <silent> <leader>au :YcmCompleter GetType<cr>
 
 "   }}}
-
 "   CamelCaseMotion -------------------------------------------------------- {{{
 
 " This works well enough for now, might change it if too many conflicts arise
@@ -626,6 +626,7 @@ call camelcasemotion#CreateMotionMappings('<localleader>')
 let g:CommandTMaxHeight=0          " maximize window size
 let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
 let g:CommandTScanDotDirectories=1 " scan dot-directories too
+let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs"
 
 "   }}}
 "   CScope ----------------------------------------------------------------- {{{
@@ -643,6 +644,35 @@ let g:cscope_silent = 1 " don't remind me every time it updates
 
 let g:lt_location_list_toggle_map = '<leader>l'
 let g:lt_quickfix_list_toggle_map = '<leader>m'
+
+"   }}}
+"   ConqueGdb -------------------------------------------------------------- {{{
+
+let g:ConqueGdb_SrcSplit = 'left'        " Open source files to the left
+let g:ConqueGdb_SaveHistory = 1          " Save commands sent via keyboard
+" let g:ConqueGdb_ReadTimeout = 50        " wait 150ms before reading output
+
+let g:ConqueGdb_Leader      = '<localleader>' " use localleader for keyboard cmds
+let g:ConqueGdb_Run         = g:ConqueGdb_Leader . 'e'
+let g:ConqueGdb_Continue    = g:ConqueGdb_Leader . 'c'
+let g:ConqueGdb_Next        = g:ConqueGdb_Leader . 'a'
+let g:ConqueGdb_Step        = g:ConqueGdb_Leader . 's'
+let g:ConqueGdb_Print       = g:ConqueGdb_Leader . 'p'
+let g:ConqueGdb_SetBreak    = g:ConqueGdb_Leader . 'b'
+let g:ConqueGdb_DeleteBreak = g:ConqueGdb_Leader . 'd'
+let g:ConqueGdb_Finish      = g:ConqueGdb_Leader . 'f'
+let g:ConqueGdb_Backtrace   = g:ConqueGdb_Leader . 'w'
+
+nnoremap <silent> <localleader>Y :ConqueGdbCommand y<CR>
+nnoremap <silent> <localleader>N :ConqueGdbCommand n<CR>
+
+let g:ConqueTerm_ReadUnfocused = 1       " update window when we leave
+let g:ConqueTerm_InsertOnEnter = 1       " enter insert when switching to window
+let g:ConqueTerm_CloseOnEnd = 1          " close on exit
+let g:ConqueTerm_StartMessages = 1       " show start messages
+" let g:ConqueTerm_UnfocusedUpdateTime = 0 " set refresh rate (ms)
+" let g:ConqueTerm_FocusedUpdateTime = 0   " set refresh rate (ms)
+let g:ConqueTerm_CWInsert = 1            " use c-w to exit the window
 
 "   }}}
 " }}}
@@ -699,12 +729,13 @@ augroup FileType_c_cpp
    autocmd!
 
    " Trigger the local options when we create a new window
-   au BufRead,BufNewFile *.cpp,*.hpp,*.inl setlocal ft=cpp
+   au BufRead,BufNewFile *.c,*.h,*.cpp,*.hpp,*.inl setlocal ft=cpp
 
    " Enable cindent rules for c/cpp files
    " formatlistpat is overwritten to remove the '*' identifier, which is
    "    ambiguous with multiline comment markers
    au FileType cpp setlocal cindent
+   au FileType cpp setlocal cinkeys+=0=break
    au FileType cpp setlocal formatlistpat=\\v^\\s*[*]+\\zs\\s*((([0-9]+\|[a-zA-Z]+)[:.)}\\]])+\|[-+*]+)\\s+
 
    " Set the textwidth
@@ -720,24 +751,62 @@ augroup FileType_c_cpp
    au FileType cpp
                \ nnoremap <buffer> <localleader>r
                \ :!scripts/run_tests.sh -R %:t:r<cr>
+
    au FileType cpp
                \ nnoremap <buffer> <localleader>R
                \ :!scripts/run_tests.sh -R %:t:r -V<cr>
 
-   au FileType cpp
-               \ nnoremap <buffer> <localleader>t
-               \ :!scripts/build_image.sh -DBUILD=Debug
-               \ && cp build/bin/G4_flobox.hex ~/host_shared<cr>
+   au BufRead,BufNewFile */G3PremiumCaseApp/*
+               \ nnoremap <buffer> <localleader>c
+               \ :!scripts/clean_all.sh<cr>
 
-   au FileType cpp
+   au BufRead,BufNewFile */G3PremiumCaseApp/*
+               \ nnoremap <buffer> <localleader>t
+               \ :!scripts/build_image.sh<cr>
+
+   au BufRead,BufNewFile */G3PremiumCaseApp/*
+               \ nnoremap <buffer> <localleader>u
+               \ :!scripts/build_image.sh && scripts/upload_image.sh<cr>
+
+   au BufRead,BufNewFile */G3PremiumCaseApp/*
+               \ nnoremap <buffer> <localleader>b
+               \ :!cd ../bootloader/firmware && scripts/build_image.sh<cr>
+
+   au BufRead,BufNewFile */G3PremiumCaseApp/*
+               \ nnoremap <buffer> <localleader>bu
+               \ :!cd ../bootloader/firmware && scripts/build_image.sh && scripts/upload_image.sh<cr>
+
+   au BufRead,BufNewFile */G3PremiumCaseApp/*
+               \ nnoremap <buffer> <localleader>gdb
+               \ :ConqueGdbExe pic32-gdb<cr>
+               \ :ConqueGdbVSplit -x scripts/gdb/init.gdb<cr>
+
+   au BufRead,BufNewFile G5/*
+               \ nnoremap <buffer> <localleader>t
+               \ :!scripts/build_image.sh -DBUILD=Debug<cr>
+
+   au BufRead,BufNewFile G5/*
                \ nnoremap <buffer> <localleader>T
-               \ :!scripts/build_image.sh -DBUILD=Release
-               \ && cp build/bin/G4_flobox.hex ~/host_shared<cr>
+               \ :!scripts/build_image.sh -DBUILD=Release<cr>
+
+   au BufRead,BufNewFile G5/*
+               \ nnoremap <buffer> <localleader>u
+               \ :!scripts/build_image.sh -DBUILD=Debug && scripts/upload_image.sh<cr>
+
+   au BufRead,BufNewFile G5/*
+               \ nnoremap <buffer> <localleader>U
+               \ :!scripts/build_image.sh -DBUILD=Release && scripts/upload_image.sh<cr>
+
+   au BufRead,BufNewFile G5/*
+               \ nnoremap <buffer> <localleader>gdb
+               \ :ConqueGdbExe arm-none-eabi-gdb<cr>
+               \ :ConqueGdbVSplit -x scritps/gdb/init.gdb<cr>
+
 
    " gtest doesn't show up in the list, due to the setlocal option above
    " however, it still gives me access to the shortcuts
    " to edit, use ':UltiSnipsEdit gtest' manually
-   au BufNew,BufRead *.cpp :UltiSnipsAddFiletypes gtest
+   au BufRead,BufNewFile *.cpp :UltiSnipsAddFiletypes gtest
 
 augroup END
 "   }}}

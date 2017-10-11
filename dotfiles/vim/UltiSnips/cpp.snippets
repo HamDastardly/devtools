@@ -75,6 +75,12 @@ snippet dc "Doxygen Comment" b
 /** \brief $0 */
 endsnippet
 
+snippet dfc "Doxygen File Comment" b
+/** \file
+ *
+ * \brief $0 */
+endsnippet
+
 snippet "p(i|o|io)?" "Doxygen parameter[in,out]" rw
 \param`!p
 if match.group(1) is None:
@@ -123,4 +129,8 @@ namespace ${1:namespace} {
 $0
 
 } // namespace $1
+endsnippet
+
+snippet noopt "No Optimization" b
+__attribute__ ((optimize("-O0")))
 endsnippet

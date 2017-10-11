@@ -19,3 +19,6 @@ GIT_CONFIG="git config"
 GIT_CHECKOUT="git checkout"
 
 LINK="ln -s"
+
+WGET="wget"
+TAR="tar xvf"

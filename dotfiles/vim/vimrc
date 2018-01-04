@@ -39,6 +39,7 @@ Plugin 'brookhong/cscope.vim'
 Plugin 'tommcdo/vim-exchange'
 Plugin 'vim-scripts/Conque-GDB'
 Plugin 'vim-airline/vim-airline' " this should always be last
+Plugin 'vim-airline/vim-airline-themes'
 
 
 " master is broken, managing stable releases manually
@@ -548,6 +549,16 @@ vnoremap <silent> <localleader>gt :call GtestFixtureName()<cr>
 "   }}}
 " }}}
 " Plugin Mappings and Settings --------------------------------------------- {{{
+"   Airline ---------------------------------------------------------------- {{{
+
+" Set the airline theme to Solarized Dark
+let g:airline_theme='solarized'
+let g:airline_solarized_bg='dark'
+
+" Add in the cool looking markers
+let g:airline_powerline_fonts = 1
+
+"   }}}
 "   NERDTree --------------------------------------------------------------- {{{
 " TODO evaluate
 

@@ -638,6 +638,7 @@ nnoremap <silent> <localleader>] :lnext<cr>
 nnoremap <silent> <localleader>[ :lprev<cr>
 
 let g:cscope_silent = 1 " don't remind me every time it updates
+let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$'
 
 "   }}}
 "   ListToggle ------------------------------------------------------------- {{{

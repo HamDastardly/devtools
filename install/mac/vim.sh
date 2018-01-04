@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -x -e
+
 # install vim (from source is important)
 brew install -s vim
 

@@ -41,7 +41,6 @@ Plugin 'vim-scripts/Conque-GDB'
 Plugin 'vim-airline/vim-airline' " this should always be last
 Plugin 'vim-airline/vim-airline-themes'
 
-
 " master is broken, managing stable releases manually
 Plugin 'SirVer/ultisnips'
 call vundle#end()
@@ -120,7 +119,7 @@ set scrolloff=10               "keep at least 10 lines above/below cursor
 set virtualedit=block          "Let block visual go past EOL
 set list                       "show special chars (below)
 set foldmethod=syntax          "use syntax folding by default
-set nonumber                   "disable line numbers by default
+set nonumber                   "disable line numbers by default (saves a column)
 set listchars=tab:>-,trail:^
 set encoding=utf-8
 set diffopt=filler,vertical
@@ -323,6 +322,26 @@ nnoremap <silent> <leader>ve :edit $MYVIMRC<cr>
 nnoremap <leader>vv
             \ :write $MYVIMRC<cr>
             \:source $MYVIMRC<cr>
+
+"   }}}
+"   Toggling UI Options ---------------------------------------------------- {{{
+
+" , toggles the cursor line
+nnoremap <silent> <leader>, :set cursorline!<cr>
+
+" . toggles line numbers
+nnoremap <silent> <leader>. :call CycleLineNumbers()<cr>
+
+function! CycleLineNumbers() " {{{
+    if &number == "nonumber"
+        set number
+    elseif &relativenumber == "norelativenumber"
+        set relativenumber
+    else
+        set norelativenumber
+        set nonumber
+    endif
+endfunction " }}}
 
 "   }}}
 "   Visual Selections ------------------------------------------------------ {{{

@@ -69,6 +69,9 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
+# forward <C-s> to terminal program, don't trap it for control flow
+stty -ixon
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -93,5 +96,11 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-# alias zshconfig="mate ~/.zshrc"
+# alias zshconfig="vim ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+alias zshedit="vim ~/.zshrc"
+alias zshreload="source ~/.zshrc"
+
+EXTRA_ZSH=~/.zsh
+source $EXTRA_ZSH/.waf_completions.zsh

@@ -107,7 +107,7 @@ set autowrite                  "auto save when moving away via ^], fe
 set autowriteall               "same, but for :edit and family
 set title                      "use a title
 set ignorecase smartcase       "use smart case searching
-set cursorline                 "highlight the current line
+set nocursorline               "disable the cursor line (slows vim down)
 set whichwrap=                 "no keys can wrap lines in normal/visual
 set hlsearch incsearch         "highlight as we go
 set history=1000               "keep a longer ex history
@@ -221,7 +221,7 @@ function! SetCInOptions() " {{{
     set cinoptions+=:0  " keep case label indentation with switch() statement
     " set cinoptions==  " no extra indent for statements following ^^^
     set cinoptions+=l1  " align to case label as if it were a {
-    set cinoptions=b1   " align break statement with case label
+    " set cinoptions=b0 " align break surrounding text
     set cinoptions+=g0  " (public:|private:|protected:) indent to class statement
     " set cinoptions=h  " no extra indent for statements following ^^^
     set cinoptions+=N-s " remove indent following a namespace declaration
@@ -428,8 +428,8 @@ noremap! <A-k> <up>
 " <leader>c puts { on a new line, and }; on a new line
 " <leader>f puts { on a new line, and } on a new line
 " <leader>e puts { at the end of this line, and } on a new line
-nnoremap <silent> <localleader>{ :call StripTrailingWhitespaces()<CR>A {<CR>};<C-o>O
-nnoremap <silent> <localleader>} :call StripTrailingWhitespaces()<CR>A {<CR>}<C-o>O
+nnoremap <silent> <localleader>{ :call StripTrailingWhitespaces()<CR>o{<CR>};<C-o>O
+nnoremap <silent> <localleader>} :call StripTrailingWhitespaces()<CR>o{<CR>}<C-o>O
 
 " use a double ';' to end the line
 nnoremap ;; A;<esc>
@@ -483,6 +483,9 @@ set foldlevelstart=99 " start with 1st level folds open
 nnoremap <Space> za
 vnoremap <Space> za
 
+" Fully open up context around current line, and center it on the screen
+nnoremap <c-z> zMzOzz
+
 " 'Focus' the current line.  Basically:
 "
 " 1. Close all folds.
@@ -491,7 +494,7 @@ vnoremap <Space> za
 "
 " Note: This mapping wipes out the z mark, which I never use, and disables
 "       background vim!
-nnoremap <c-z> mzzMzvzz`z
+" nnoremap <c-z> mzzMzvzz`z
 
 " Use a nicer folder text method, forget where I got this
 function! MyFoldText() " {{{
@@ -634,12 +637,13 @@ let g:ycm_seed_identifiers_with_syntax = 1              " seed ycm completions
 let g:ycm_confirm_extra_conf = 0                        " stop asking if I want to use or not
 let g:ycm_goto_buffer_command = 'vertical-split'        " open in v-split
 " let g:ycm_auto_trigger = 0                            " Disable if completions are slow
-let g:ycm_key_invoke_completion = '<C-Space>'           " map the manual trigger
+let g:ycm_key_invoke_completion = '<A-Space>'           " map the manual trigger
 let g:ycm_server_log_level = 'debug'                    " gives more info in the logs
 
 " convenient for using the YCM engine to jump around to declarations/definitions
 " TODO move to YCM configurations
 nnoremap <silent> <leader>go :YcmCompleter GoTo<cr>
+nnoremap <silent> <leader>ref :YcmCompleter GoToReferences<cr>
 nnoremap <silent> <leader>fi :YcmCompleter FixIt<cr>
 nnoremap <silent> <leader>do :YcmCompleter GetDoc<cr>
 nnoremap <silent> <leader>au :YcmCompleter GetType<cr>
@@ -657,6 +661,7 @@ let g:CommandTMaxHeight=0          " maximize window size
 let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
 let g:CommandTScanDotDirectories=1 " scan dot-directories too
 let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs"
+let g:CommandTFileScanner='find'
 
 "   }}}
 "   CScope ----------------------------------------------------------------- {{{
@@ -668,7 +673,6 @@ nnoremap <silent> <localleader>] :lnext<cr>
 nnoremap <silent> <localleader>[ :lprev<cr>
 
 let g:cscope_silent = 1 " don't remind me every time it updates
-let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$'
 
 "   }}}
 "   ListToggle ------------------------------------------------------------- {{{
@@ -679,31 +683,27 @@ let g:lt_quickfix_list_toggle_map = '<leader>m'
 "   }}}
 "   ConqueGdb -------------------------------------------------------------- {{{
 
-let g:ConqueGdb_SrcSplit = 'left'        " Open source files to the left
-let g:ConqueGdb_SaveHistory = 1          " Save commands sent via keyboard
-" let g:ConqueGdb_ReadTimeout = 50        " wait 150ms before reading output
+let g:ConqueGdb_SrcSplit       = 'left' " Open source files to the left
+let g:ConqueGdb_SaveHistory    = 1      " Save commands sent via keyboard
+let g:ConqueTerm_ReadUnfocused = 1      " update window when we leave
+let g:ConqueTerm_InsertOnEnter = 1      " enter insert when switching to window
+let g:ConqueTerm_CloseOnEnd    = 1      " close on exit
+let g:ConqueTerm_StartMessages = 1      " show start messages
+let g:ConqueTerm_CWInsert      = 1      " use c-w to exit the window
 
 let g:ConqueGdb_Leader      = '<localleader>' " use localleader for keyboard cmds
-let g:ConqueGdb_Run         = g:ConqueGdb_Leader . 'e'
-let g:ConqueGdb_Continue    = g:ConqueGdb_Leader . 'c'
-let g:ConqueGdb_Next        = g:ConqueGdb_Leader . 'a'
-let g:ConqueGdb_Step        = g:ConqueGdb_Leader . 's'
-let g:ConqueGdb_Print       = g:ConqueGdb_Leader . 'p'
-let g:ConqueGdb_SetBreak    = g:ConqueGdb_Leader . 'b'
-let g:ConqueGdb_DeleteBreak = g:ConqueGdb_Leader . 'd'
-let g:ConqueGdb_Finish      = g:ConqueGdb_Leader . 'f'
-let g:ConqueGdb_Backtrace   = g:ConqueGdb_Leader . 'w'
+" let g:ConqueGdb_Run         = g:ConqueGdb_Leader . 'e'
+" let g:ConqueGdb_Continue    = g:ConqueGdb_Leader . 'c'
+" let g:ConqueGdb_Next        = g:ConqueGdb_Leader . 'a'
+" let g:ConqueGdb_Step        = g:ConqueGdb_Leader . 's'
+" let g:ConqueGdb_Print       = g:ConqueGdb_Leader . 'p'
+" let g:ConqueGdb_SetBreak    = g:ConqueGdb_Leader . 'b'
+" let g:ConqueGdb_DeleteBreak = g:ConqueGdb_Leader . 'd'
+" let g:ConqueGdb_Finish      = g:ConqueGdb_Leader . 'f'
+" let g:ConqueGdb_Backtrace   = g:ConqueGdb_Leader . 'w'
 
 nnoremap <silent> <localleader>Y :ConqueGdbCommand y<CR>
 nnoremap <silent> <localleader>N :ConqueGdbCommand n<CR>
-
-let g:ConqueTerm_ReadUnfocused = 1       " update window when we leave
-let g:ConqueTerm_InsertOnEnter = 1       " enter insert when switching to window
-let g:ConqueTerm_CloseOnEnd = 1          " close on exit
-let g:ConqueTerm_StartMessages = 1       " show start messages
-" let g:ConqueTerm_UnfocusedUpdateTime = 0 " set refresh rate (ms)
-" let g:ConqueTerm_FocusedUpdateTime = 0   " set refresh rate (ms)
-let g:ConqueTerm_CWInsert = 1            " use c-w to exit the window
 
 "   }}}
 " }}}
@@ -729,14 +729,17 @@ augroup ALL
   endfunction " }}}
 
   " Clear trailing white spaces when entering, saving, or leaving a buffer
-  au BufEnter,BufWritePre,BufLeave * silent! call StripTrailingWhitespaces()
+  au InsertLeave * if &binary==0 | silent! call StripTrailingWhitespaces() | endif
 
   " If we made changes to the file, save them before switching buffers
-  au BufLeave,FocusLost * silent! update
+  au BufLeave,FocusLost * if &modifiable | silent! update | endif
 
   " Refresh the current buffer when we navigate to it or enter insert mode
   " if we have modify permissions
-  au BufEnter,InsertEnter * if &modifiable | execute "checktime" @% | endif
+  " au BufWinEnter * if &modifiable | execute "checktime" @% | endif
+
+  " update diffs after each save
+  autocmd BufWritePost * if &diff == 1 | diffupdate | endif
 
   " Resize splits when the window is resized
   au VimResized * if &modifiable | wincmd = | endif
@@ -766,73 +769,10 @@ augroup FileType_c_cpp
    " formatlistpat is overwritten to remove the '*' identifier, which is
    "    ambiguous with multiline comment markers
    au FileType cpp setlocal cindent
-   au FileType cpp setlocal cinkeys+=0=break
    au FileType cpp setlocal formatlistpat=\\v^\\s*[*]+\\zs\\s*((([0-9]+\|[a-zA-Z]+)[:.)}\\]])+\|[-+*]+)\\s+
 
    " Set the textwidth
    au FileType cpp setlocal textwidth=80
-
-"    " Shooty Face Temp
-"    " Run unit tests for the file being edited
-"    au FileType cpp
-"                \ nnoremap <buffer> <localleader>g
-"                \ :!cd build && make -j8 shooty_face && bin/shooty_face<cr>
-
-   " Run unit tests for the file being edited
-   au FileType cpp
-               \ nnoremap <buffer> <localleader>r
-               \ :!scripts/run_tests.sh -R %:t:r<cr>
-
-   au FileType cpp
-               \ nnoremap <buffer> <localleader>R
-               \ :!scripts/run_tests.sh -R %:t:r -V<cr>
-
-   au BufRead,BufNewFile */G3PremiumCaseApp/*
-               \ nnoremap <buffer> <localleader>c
-               \ :!scripts/clean_all.sh<cr>
-
-   au BufRead,BufNewFile */G3PremiumCaseApp/*
-               \ nnoremap <buffer> <localleader>t
-               \ :!scripts/build_image.sh<cr>
-
-   au BufRead,BufNewFile */G3PremiumCaseApp/*
-               \ nnoremap <buffer> <localleader>u
-               \ :!scripts/build_image.sh && scripts/upload_image.sh<cr>
-
-   au BufRead,BufNewFile */G3PremiumCaseApp/*
-               \ nnoremap <buffer> <localleader>b
-               \ :!cd ../bootloader/firmware && scripts/build_image.sh<cr>
-
-   au BufRead,BufNewFile */G3PremiumCaseApp/*
-               \ nnoremap <buffer> <localleader>bu
-               \ :!cd ../bootloader/firmware && scripts/build_image.sh && scripts/upload_image.sh<cr>
-
-   au BufRead,BufNewFile */G3PremiumCaseApp/*
-               \ nnoremap <buffer> <localleader>gdb
-               \ :ConqueGdbExe pic32-gdb<cr>
-               \ :ConqueGdbVSplit -x scripts/gdb/init.gdb<cr>
-
-   au BufRead,BufNewFile G5/*
-               \ nnoremap <buffer> <localleader>t
-               \ :!scripts/build_image.sh -DBUILD=Debug<cr>
-
-   au BufRead,BufNewFile G5/*
-               \ nnoremap <buffer> <localleader>T
-               \ :!scripts/build_image.sh -DBUILD=Release<cr>
-
-   au BufRead,BufNewFile G5/*
-               \ nnoremap <buffer> <localleader>u
-               \ :!scripts/build_image.sh -DBUILD=Debug && scripts/upload_image.sh<cr>
-
-   au BufRead,BufNewFile G5/*
-               \ nnoremap <buffer> <localleader>U
-               \ :!scripts/build_image.sh -DBUILD=Release && scripts/upload_image.sh<cr>
-
-   au BufRead,BufNewFile G5/*
-               \ nnoremap <buffer> <localleader>gdb
-               \ :ConqueGdbExe arm-none-eabi-gdb<cr>
-               \ :ConqueGdbVSplit -x scritps/gdb/init.gdb<cr>
-
 
    " gtest doesn't show up in the list, due to the setlocal option above
    " however, it still gives me access to the shortcuts
@@ -841,11 +781,47 @@ augroup FileType_c_cpp
 
 augroup END
 "   }}}
+"   Work ------------------------------------------------------------------- {{{
+augroup Work
+   autocmd!
+
+   " Build/Flash Images
+   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wc :!waf clean<cr>
+   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wk :!waf build_s32k<cr>
+   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wf :!waf smc_flash<cr>
+   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wa :!ASIMOV_DISABLE_CAN_SLEEP=1 waf <cr>
+
+   " Unit Tests
+   au BufNewFile,BufRead */work/aismov/* nnoremap <buffer> <localleader>wr :!waf
+
+augroup END
+"   }}}
 "   Test Space ------------------------------------------------------------- {{{
 augroup TestSpace
    autocmd!
 
 augroup END
+"   }}}
+"   Hex Editing (Binary Files) --------------------------------------------- {{{
+augroup Binary
+   autocmd!
+
+   " vim -b : edit binary using xxd-format!
+   au BufReadPre  *.bin let &bin=1
+
+   " can't join a line with ! using pipes, all following commands go to terminal
+   au BufReadPost *.bin if &bin | %!xxd
+   au BufReadPost *.bin set ft=xxd | endif
+
+   " can't join a line with ! using pipes, all following commands go to terminal
+   au BufWritePre *.bin if &bin | %!xxd -r
+   au BufWritePre *.bin endif
+
+   " can't join a line with ! using pipes, all following commands go to terminal
+   au BufWritePost *.bin if &bin | %!xxd
+   au BufWritePost *.bin set nomodified | endif
+augroup END
+    "
 "   }}}
 "   Make ------------------------------------------------------------------- {{{
 augroup FileType_make

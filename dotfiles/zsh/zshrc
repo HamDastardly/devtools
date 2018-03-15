@@ -1,5 +1,27 @@
-# If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$PATH
+# usage:
+#   insert_path <path> (pre|post)
+function insert_path
+{
+    if [[ $# != 2 ]]; then
+        return 1
+    fi
+
+    local item=$1
+    local location=$2
+
+    if [[ $PATH =~ $item ]]; then
+        return 0
+    fi
+
+    case $location in
+        pre)  export PATH=${item}:$PATH ; return 0 ;;
+        post) export PATH=$PATH:${item} ; return 0 ;;
+    esac
+
+    return 1;
+}
+
+insert_path /usr/local/bin post
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
@@ -24,7 +46,7 @@ ZSH_THEME="kphoen"
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
+HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
@@ -42,7 +64,7 @@ ZSH_THEME="kphoen"
 # ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -55,7 +77,7 @@ ZSH_THEME="kphoen"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+ZSH_CUSTOM=~/.zsh
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
@@ -70,12 +92,6 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 
-# forward <C-s> to terminal program, don't trap it for control flow
-stty -ixon
-
-EXTRA_ZSH=~/.zsh
-source $EXTRA_ZSH/aliases.zsh
-source $EXTRA_ZSH/completions/waf.zsh
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -83,17 +99,17 @@ source $EXTRA_ZSH/completions/waf.zsh
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='vim'
+fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
 # ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
+export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -103,3 +119,18 @@ source $EXTRA_ZSH/completions/waf.zsh
 # Example aliases
 # alias zshconfig="vim ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# forward <C-s> to terminal program, don't trap it for control flow
+stty -ixon
+
+# Curse for relief
+eval $(thefuck --alias)
+
+# source extra files
+for completion_file ($ZSH_CUSTOM/completions/*.zsh); do
+    source $completion_file
+done
+
+for extra_scripts ($ZSH_CUSTOM/etc/*.zsh); do
+    source $extra_scripts
+done

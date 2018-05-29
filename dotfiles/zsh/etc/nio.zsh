@@ -4,7 +4,7 @@
 insert_path $HOME/bin            post
 insert_path $HOME/bin/s32k-tools post
 
-export ASIMOV_DISABLE_CAN_SLEEP=1
+export asimov_ip="10.118.48.133" #default: 172.20.1.12
 
 ################################################################################
 #                                   Aliases                                    #
@@ -47,34 +47,35 @@ function asimov-
     }
 
     # network commands
-    function $0{scp,ssh,sftp,ping,id,connect}
+    function $0{scp,ssh,sftp,ping,key}
     {
         local asimov_ssh_opts="-o StrictHostKeyChecking=no"
-        local asimov_default_ip="172.20.1.12"
 
         case $(print $0 | cut -d '-' -f2) in
-            ping) ping ${@:1} $asimov_default_ip ;;
-            ssh)  retry asimov-ping -c1 -t1; ssh         $asimov_ssh_opts        root@$asimov_default_ip ${@:1}                            ;;
-            scp)  retry asimov-ping -c1 -t1; scp         $asimov_ssh_opts ${@:1} root@$asimov_default_ip:$upload_dir/$(basename ${@:1})    ;;
-            sftp) retry asimov-ping -c1 -t1; sftp        $asimov_ssh_opts        root@$asimov_default_ip                                   ;;
-            id)   retry asimov-ping -c1 -t1; ssh-copy-id $asimov_ssh_opts        root@$asimov_default_ip; ssh-keygen -R $asimov_default_ip ;;
+            ping) ping -c2 -t2 -o $asimov_ip ;;
+            ssh)  retry asimov-ping; ssh         $asimov_ssh_opts        root@$asimov_ip ${@:1}                            ;;
+            scp)  retry asimov-ping; scp         $asimov_ssh_opts ${@:1} root@$asimov_ip:$upload_dir/$(basename ${@:1})    ;;
+            sftp) retry asimov-ping; sftp        $asimov_ssh_opts        root@$asimov_ip                                   ;;
+            key)  retry asimov-ping; ssh-copy-id $asimov_ssh_opts        root@$asimov_ip; ssh-keygen -R $asimov_ip         ;;
+        esac
+    }
+
+    # network invoked commands
+    function $0v-shutdown
+    {
+        case $(print $0 | cut -d '-' -f3) in
+            shutdown) asimov-ssh shutdown
         esac
     }
 
     # diagnostics commands
-    function $0slog{-once,-all,-new}{,-filter}
+    function $0slog{,-filter}
     {
         local cmd="slog2info -Saf"
 
-        case $(print $0 | cut -d '-' -f3) in
-            once)         ;;
-            all) cmd+="w" ;;
-            new) cmd+="W" ;;
-        esac
-
-        if [[ $(print $0 | cut -d '-' -f4) == "filter" ]]
+        if [[ $(print $0 | cut -d '-' -f3) == "filter" ]]
         then
-            cmd+="b ${@:1}"
+            cmd+=" -b ${@:1}"
         fi
 
         asimov-ssh $cmd
@@ -95,19 +96,17 @@ function asimov-
     }
 
     # MCU reflash options
-    function $0{v,k}-update{,-bl}
+    function $0{v,k}-update-{app,bl}
     {
         case $(print $0 | cut -d '-' -f2-4) in
-            k-update)
-                local file=${1:-$s32k_build_dir/s32k-app.upd.bin}
-                asimov-scp $$file && asimov-ssh "smc-update -i $upload_dir/$(basename $file)" ;;
-            v-update)
-                local file=${1:-$s32v_build_dir/app.bin}
-                asimov-scp $file && asimov-ssh "nio-qspi-flash.sh app $upload_dir/$(basename $file) && shutdown" ;;
-            v-update-bl)
-                local file=${1:-$s32v_build_dir/ipl/ipl-asimov.bin}
-                asimov-scp $file && asimov-ssh "nio-qspi-flash.sh boot $upload_dir/$(basename $file) && shutdown" ;;
+            k-update-app) local default="$s32k_build_dir/s32k-app.upd.bin"   ; local arg="--smc_app"  ;;
+            k-update-bl)  local default="$s32k_build_dir/s32k-bl.upd.bin"    ; local arg="--smc_boot" ;;
+            v-update-app) local default="$s32v_build_dir/app.bin"            ; local arg="--mcu_app"  ;;
+            v-update-bl)  local default="$s32v_build_dir/ipl/ipl-asimov.bin" ; local arg="--mcu_boot" ;;
         esac
+
+        local file=${1:-$default}
+        asimov-scp $file && asimov-ssh "flash -v $arg $upload_dir/$(basename $file) --reboot"
     }
 
     # UDS commands
@@ -136,6 +135,90 @@ function asimov-
             build) open $work_dir/s32v-uboot-toolchain/case-sensitive.sparseimage &&                \
                    CROSS_COMPILE=/Volumes/case-sensitive/install/bin/aarch64-linux-gnu- make -j8 && \
                    (cd tools/s32v234-qspi && CROSS_COMPILE=/Volumes/case-sensitive/install/bin/aarch64-linux-gnu- make) ;;
+        esac
+    }
+
+    # JLink loadbin/savebin
+    function $0s32k-{load,save}bin-{flash,flash_bl,flash_data,flash_data_vpd,flash_app,flash_app_rsvd,flash_spare,flash_reserved,flash_vpd_rsvd,flash_key_store,flash_log,flex_ram,ram}
+    {
+        case $(print $0 | cut -d '-' -f4) in
+            flash)           local default='s32k-flash.bin'           ; local address=0x00000000 ; local size=0x80000  ;; # 512K
+            flash_bl)        local default='s32k-flash_bl.bin'        ; local address=0x00000000 ; local size=0x8000   ;; # 32K
+            flash_data)      local default='s32k-flash_data.bin'      ; local address=0x00008000 ; local size=0x8000   ;; # 32K
+            flash_data_vpd)  local default='s32k-flash_data_vpd.bin'  ; local address=0x0000F000 ; local size=0x1000   ;; # 4K
+            flash_app)       local default='s32k-flash_app.bin'       ; local address=0x00010000 ; local size=0x30000  ;; # 192K
+            flash_app_rsvd)  local default='s32k-flash_app_rsvd.bin'  ; local address=0x00040000 ; local size=0x8000   ;; # 32K
+            flash_spare)     local default='s32k-flash_spare.bin'     ; local address=0x00048000 ; local size=0x30000  ;; # 192K
+            flash_reserved)  local default='s32k-flash_reserved.bin'  ; local address=0x00078000 ; local size=0x8000   ;; # 32K
+            flash_vpd_rsvd)  local default='s32k-flash_vpd_rsvd.bin'  ; local address=0x10000000 ; local size=0x1000   ;; # 4K
+            flash_key_store) local default='s32k-flash_key_store.bin' ; local address=0x10001000 ; local size=0x3000   ;; # 12K
+            flash_log)       local default='s32k-flash_log.bin'       ; local address=0x10004000 ; local size=0xC000   ;; # 48K
+            flex_ram)        local default='s32k-flex_ram.bin'        ; local address=0x14000000 ; local size=0xE00    ;; # 4K - 512
+            ram)             local default='s32k-ram.bin'             ; local address=0x1FFF8000 ; local size=0xF000   ;; # 60K
+        esac
+
+        local file=${1:-$default}
+        echo $file
+
+        case $(print $0 | cut -d '-' -f3) in
+            loadbin) local cmd="loadbin \"$file\", $address" ;;
+            savebin) local cmd="savebin \"$file\", $address, $size" ;;
+        esac
+
+        local commands='/tmp/commands.txt'
+        : >$commands
+        echo "connect" >>$commands
+        echo "$cmd"    >>$commands
+        echo "exit"    >>$commands
+        JLinkExe -Device S32K144 -If SWD -speed auto -CommandFile $commands
+    }
+
+    # tmux commands
+    function $0tmux-{1,2,3}
+    {
+        case $(print $0 | cut -d '-' -f3) in
+            1) # code editing
+                tmux rename-window "Asimov Editor"
+                # nvim - LHS 70%
+                tmux split-window -h -p30
+                tmux select-pane -t0
+                tmux send-keys "${EDITOR}" Enter
+                ;;
+            2) # Console
+                tmux new-window -n "Asimov Console"
+                # slog | can keep alive - bottom panel
+                tmux split-window -v -p20
+                tmux select-pane -t1
+                tmux send-keys "slog.sh -sfaw" Enter
+                tmux split-window -h -p20
+                tmux select-pane -t2
+                tmux send-keys "can-keep-alive" Enter
+                # serial consoles - RHS split
+                tmux select-pane -t0
+                tmux split-window -h
+                tmux select-pane -t1
+                tmux send-keys "asimov-serial-smc" Enter
+                tmux split-window -v
+                tmux select-pane -t2
+                tmux send-keys "asimov-serial-mcu" Enter
+                # LHS ssh
+                tmux select-pane -t0
+                tmux send-keys "ssh.sh" Enter
+                ;;
+            3) # SMC gdb
+                tmux new-window -n "Asimov GDB"
+                # nvim read-only - RHS TOP
+                tmux split-window -h
+                tmux select-pane -t1
+                tmux send-keys "${EDITOR} -R" Enter
+                # gdbserver - RHS BOT
+                tmux split-window -v -p20
+                tmux select-pane -t2
+                tmux send-keys "waf smc_gdbserver" Enter
+                #LHS - gdb
+                tmux select-pane -t0
+                tmux send-keys "waf smc_gdb" Enter
+                ;;
         esac
     }
 }

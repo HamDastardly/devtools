@@ -9,6 +9,10 @@ set cpo&vim
 
 AddTabularPattern! comment /\/\//l1
 AddTabularPattern! doxygen_comment /\/\/\/</l1
+AddTabularPattern! csv /,\zs\s/l0l0
+AddTabularPattern! curlies /\({\|}\)/l1l1
+AddTabularPattern! params1 /\vparam\[(in|out|in,out)\]\s+\zs\w+\ze/l1l1
+AddTabularPattern! params2 /\vparam\[(in|out|in,out)\]\s+\w+\zs\s\ze/l0l1
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

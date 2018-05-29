@@ -18,47 +18,47 @@ endsnippet
 snippet while "while loop" w
 while (${1:condition})
 {
-	${VISUAL}
+	$0${VISUAL}
 }
 endsnippet
 
 snippet do "do-while loop" w
 do
 {
-	${VISUAL}
+	$0${VISUAL}
 } while (${1:condition});
 endsnippet
 
 snippet cout "stdout stream" w
-std::cout << ${1:${VISUAL}} << std::endl;
+std::cout << $0${VISUAL} << std::endl;
 endsnippet
 
 snippet cerr "stderr stream" w
-std::cerr << ${VISUAL} << std::endl;
+std::cerr << $0${VISUAL} << std::endl;
 endsnippet
 
 snippet clog "stdlog stream" w
-std::clog << ${VISUAL} << std::endl;
+std::clog << $0${VISUAL} << std::endl;
 endsnippet
 
 snippet if "if statement" b
 if (${1:true})
 {
-	${2:${VISUAL}}
+	$0${VISUAL}
 }
 endsnippet
 
 snippet elif "else if .. (eli)"
-else if (${1:/* condition */})
+else if (${1:true})
 {
-	${VISUAL}$0
+	$0${VISUAL}
 }
 endsnippet
 
 snippet else "else statement" w
 else
 {
-	${VISUAL}$0
+	$0${VISUAL}
 }
 endsnippet
 
@@ -67,16 +67,23 @@ snippet once "Header Include Guard" b
 endsnippet
 
 snippet fore "For Each" b
-for(${3:auto} ${1:x} : ${2:y})
+for (${1:auto} ${2:x} : ${3:y})
 {
-	${4:${VISUAL}}
+	$0${VISUAL}
 }
 endsnippet
 
 snippet for "For Loop" b
-for(size_t ${1:ndx} = 0; $1 < ${2:limit}; ++$1)
+for (${1:size_t} ${2:ndx} = 0; $2 < ${3:limit}; ++$2)
 {
-	${3:${VISUAL}}
+	$0${VISUAL}
+}
+endsnippet
+
+snippet forever "For Ever Loop" b
+for (;;)
+{
+	$0${VISUAL}
 }
 endsnippet
 
@@ -94,33 +101,34 @@ snippet dfc "Doxygen File Comment" b
  * \brief $0 */
 endsnippet
 
-snippet "p(i|o|io)?" "Doxygen parameter[in,out]" rw
+snippet "dp(io|i|o)?" "Doxygen parameter[in,out]" rw
 \param`!p
 if match.group(1) is None:
 	snip.rv = ""
 elif "i" == match.group(1):
 	snip.rv = "[in]"
-elif "o" ==match.group(1):
+elif "o" == match.group(1):
 	snip.rv = "[out]"
 elif "io" == match.group(1):
 	snip.rv = "[in,out]"` $0
 endsnippet
 
-snippet r "Doxygen return" w
+snippet dr "Doxygen return" w
 \return $0
 endsnippet
 
 snippet switch "Switch Statement" w
 switch (${1:condition})
 {
-$0
+case $0:
+	break;
 default:
 	break;
 }
 endsnippet
 
 snippet case "Case Statement" w
-case ${1:match_case}:
+case ${1:when}:
 	$0
 	break;
 endsnippet
@@ -140,19 +148,54 @@ endsnippet
 snippet ns "namespace" b
 namespace ${1:namespace} {
 
-$0
+	$0
 
 } // namespace $1
 endsnippet
 
-snippet noopt "No Optimization" b
+snippet noopt "No Optimization" w
 __attribute__ ((optimize("-O0")))
 endsnippet
 
 snippet com "Comment" b
-/* ${1:${VISUAL}} */
+/* $0${VISUAL} */
 endsnippet
 
 snippet debug "Debug Printf" b
 printf("%s:%d\n", __FUNCTION__, __LINE__);
+endsnippet
+
+snippet def "#define" b
+#define $0${VISUAL}
+endsnippet
+
+snippet ifdef "#ifdef() -- simple" b
+#ifdef ${1:DEFINITION}
+$0${VISUAL}
+#endif
+endsnippet
+
+snippet ifdef1 "#if defined() -- safe" b
+#if defined(${1:DEFINITION}) && $1
+$0${VISUAL}
+#endif
+endsnippet
+
+snippet ifndef "#if not defined()" b
+#ifndef ${1:DEFINITION}
+$0${VISUAL}
+#endif
+endsnippet
+
+snippet lic "license" b
+/*
+ * Copyright (c) 2018, NIO USA, Inc.  All rights reserved.
+ *
+ * Any use, reproduction, distribution, and/or transfer of this file is strictly
+ * prohibited without the express written permission of the current copyright
+ * owner.
+ *
+ * Any licensed derivative work must retain this notice.
+ *
+ */
 endsnippet

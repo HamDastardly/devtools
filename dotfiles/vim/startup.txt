@@ -1,0 +1,111 @@
+
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.009  000.009: --- NVIM STARTING ---
+000.934  000.925: locale set
+001.895  000.961: inits 1
+001.915  000.020: window checked
+002.398  000.483: parsing arguments
+002.400  000.003: expanding arguments
+002.514  000.114: inits 2
+002.817  000.303: init highlight
+006.096  001.869  001.869: sourcing /Users/Hamilton.Little/.config/nvim/autoload/plug.vim
+028.464  000.073  000.073: sourcing /Users/Hamilton.Little/.nvim/plugins/ultisnips/ftdetect/snippets.vim
+028.677  019.377  019.304: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/filetype.vim
+029.204  000.061  000.061: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/ftplugin.vim
+029.682  000.056  000.056: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/indent.vim
+031.003  000.216  000.216: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/syntax/syncolor.vim
+031.146  000.761  000.545: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/syntax/synload.vim
+031.185  001.210  000.449: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/syntax/syntax.vim
+032.105  000.285  000.285: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/syntax/syncolor.vim
+033.769  000.171  000.171: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/syntax/syncolor.vim
+034.400  000.171  000.171: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/syntax/syncolor.vim
+036.358  003.843  003.501: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-colors-solarized/colors/solarized.vim
+038.382  000.202  000.202: sourcing /Users/Hamilton.Little/.nvim/plugins/CamelCaseMotion/autoload/camelcasemotion.vim
+039.741  036.067  009.164: sourcing /Users/Hamilton.Little/.config/nvim/init.vim
+039.758  000.873: sourcing vimrc file(s)
+041.463  000.181  000.181: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline.vim
+042.002  000.143  000.143: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/init.vim
+042.807  000.142  000.142: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/parts.vim
+043.528  002.653  002.186: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/plugin/airline.vim
+044.402  000.287  000.287: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/extensions.vim
+044.845  000.087  000.087: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/extensions/quickfix.vim
+045.489  000.146  000.146: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/extensions/whitespace.vim
+046.020  000.078  000.078: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/extensions/wordcount.vim
+046.508  000.062  000.062: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/extensions/keymap.vim
+051.582  000.117  000.117: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/section.vim
+052.189  000.204  000.204: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/highlighter.vim
+055.062  000.077  000.077: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/themes.vim
+055.374  000.990  000.913: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline-themes/autoload/airline/themes/solarized.vim
+063.533  000.114  000.114: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/util.vim
+064.101  000.179  000.179: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/builder.vim
+064.716  000.128  000.128: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline/autoload/airline/extensions/default.vim
+086.448  000.052  000.052: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-airline-themes/plugin/airline-themes.vim
+088.338  000.165  000.165: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/autoload/nerdtree.vim
+089.704  000.475  000.475: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/path.vim
+090.208  000.151  000.151: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/menu_controller.vim
+090.665  000.112  000.112: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/menu_item.vim
+091.164  000.129  000.129: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/key_map.vim
+091.735  000.227  000.227: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/bookmark.vim
+092.313  000.235  000.235: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/tree_file_node.vim
+093.041  000.381  000.381: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/tree_dir_node.vim
+093.609  000.224  000.224: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/opener.vim
+094.191  000.239  000.239: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/creator.vim
+094.615  000.080  000.080: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/flag_set.vim
+095.112  000.159  000.159: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/nerdtree.vim
+095.782  000.305  000.305: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/ui.vim
+096.190  000.064  000.064: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/event.vim
+096.605  000.078  000.078: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/lib/nerdtree/notifier.vim
+097.353  000.399  000.399: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/autoload/nerdtree/ui_glue.vim
+107.617  000.120  000.120: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/nerdtree_plugin/exec_menuitem.vim
+108.475  000.568  000.568: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/nerdtree_plugin/fs_menu.vim
+108.798  021.347  017.236: sourcing /Users/Hamilton.Little/.nvim/plugins/nerdtree/plugin/NERD_tree.vim
+109.926  000.120  000.120: sourcing /Users/Hamilton.Little/.nvim/plugins/ListToggle/plugin/listtoggle.vim
+111.323  000.405  000.405: sourcing /Users/Hamilton.Little/.nvim/plugins/CamelCaseMotion/plugin/camelcasemotion.vim
+113.093  000.781  000.781: sourcing /Users/Hamilton.Little/.nvim/plugins/cscope.vim/plugin/cscope.vim
+114.373  000.338  000.338: sourcing /Users/Hamilton.Little/.nvim/plugins/tabular/plugin/Tabular.vim
+115.827  000.501  000.501: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-exchange/plugin/exchange.vim
+117.893  001.050  001.050: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-abolish/plugin/abolish.vim
+119.087  000.242  000.242: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-commentary/plugin/commentary.vim
+123.885  003.806  003.806: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-fugitive/plugin/fugitive.vim
+125.339  000.458  000.458: sourcing /Users/Hamilton.Little/.nvim/plugins/vim-surround/plugin/surround.vim
+127.296  000.115  000.115: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/autoload/provider/pythonx.vim
+664.124  537.360  537.245: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/autoload/provider/python3.vim
+665.475  000.234  000.234: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/autoload/remote/host.vim
+665.583  000.861  000.627: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/autoload/provider/python.vim
+666.331  000.109  000.109: sourcing /Users/Hamilton.Little/.nvim/plugins/ultisnips/autoload/UltiSnips/map_keys.vim
+666.426  540.132  001.802: sourcing /Users/Hamilton.Little/.nvim/plugins/ultisnips/plugin/UltiSnips.vim
+667.982  000.063  000.063: sourcing /Users/Hamilton.Little/.nvim/plugins/command-t/autoload/commandt/mirkwood.vim
+668.143  000.680  000.617: sourcing /Users/Hamilton.Little/.nvim/plugins/command-t/plugin/command-t.vim
+669.367  000.272  000.272: sourcing /Users/Hamilton.Little/.nvim/plugins/YouCompleteMe/plugin/youcompleteme.vim
+670.972  000.054  000.054: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/gui_shim.vim
+671.899  000.270  000.270: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/gzip.vim
+672.609  000.052  000.052: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/health.vim
+673.357  000.094  000.094: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/man.vim
+674.508  000.492  000.492: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/matchit.vim
+675.360  000.189  000.189: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/matchparen.vim
+676.452  000.436  000.436: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/netrwPlugin.vim
+677.520  000.404  000.404: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/rplugin.vim
+678.236  000.047  000.047: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/rrhelper.vim
+679.023  000.131  000.131: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/shada.vim
+679.741  000.056  000.056: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/spellfile.vim
+680.576  000.170  000.170: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/tarPlugin.vim
+681.360  000.122  000.122: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/tohtml.vim
+682.070  000.054  000.054: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/tutor.vim
+682.930  000.204  000.204: sourcing /usr/local/Cellar/neovim/0.2.2_1/share/nvim/runtime/plugin/zipPlugin.vim
+683.068  065.307: loading plugins
+683.283  000.215: loading packages
+685.061  000.275  000.275: sourcing /Users/Hamilton.Little/.nvim/plugins/tabular/autoload/tabular.vim
+686.611  002.297  002.022: sourcing /Users/Hamilton.Little/.nvim/plugins/tabular/after/plugin/TabularMaps.vim
+687.853  000.111  000.111: sourcing /Users/Hamilton.Little/.nvim/plugins/ultisnips/after/plugin/UltiSnips_after.vim
+689.661  000.637  000.637: sourcing after/plugin/TabularMaps.vim
+689.792  003.464: loading after plugins
+689.801  000.009: inits 3
+690.748  000.946: reading ShaDa
+694.281  003.533: clearing screen
+696.342  002.061: opening buffers
+696.381  000.039: BufEnter autocommands
+696.383  000.003: editing files in windows

@@ -1,30 +1,30 @@
 ################################################################################
 #                             Editing and Sourcing                             #
 ################################################################################
-function profile
+function profile-
 {
     #profile-*
-    function $0-{zsh,tmux,nio}
+    function $0{zsh,tmux,nio}
     {
         case $(print $0 | cut -d '-' -f2) in
-            zsh)  vim ~/.zshrc ;;
-            tmux) vim ~/.tmux.conf ;;
-            nio)  vim ~/.zsh/etc/nio.zsh ;;
+            zsh)  $EDITOR ~/.zsh             ; reload-zsh  ;;
+            tmux) $EDITOR ~/.tmux.conf       ; reload-tmux ;;
+            nio)  $EDITOR ~/.zsh/etc/nio.zsh ; reload-zsh  ;;
         esac
     }
 }
-profile
+profile-
 
-function reload
+function reload-
 {
     #reload-*
-    function $0-{zsh,tmux}
+    function $0{zsh,tmux}
     case $(print $0 | cut -d '-' -f2) in
         zsh) source ~/.zshrc ;;
         tmux) tmux source-file ~/.tmux.conf ;;
     esac
 }
-reload
+reload-
 
 
 

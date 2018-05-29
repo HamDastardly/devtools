@@ -1,8 +1,9 @@
 " Preamble ----------------------------------------------------------------- {{{
 "   Author ----------------------------------------------------------------- {{{
 
-" Hamilton Little: hamilton.little@gmail.com
-" Github Username: HamboLagos
+" Author: Hamilton Little
+" Email: hamilton.little@gmail.com
+" Github: https://github.com/HamboLagos
 
 "   }}}
 "   Note on Operators ------------------------------------------------------ {{{
@@ -14,40 +15,40 @@
 " cmap: command line     | map! (IC mode)
 
 "   }}}
+"   Pre-Initialization ----------------------------------------------------- {{{
+
+" must be set before loading plugins
+let g:python_host_prog = '/usr/local/bin/python'
+
+"   }}}
 "   Installed Plugins ------------------------------------------------------ {{{
 
-" Required before adding plugins
-set nocompatible
-filetype off
-set rtp+=~/.vim/bundle/Vundle.vim
+call plug#begin('~/.nvim/plugins/')
+Plug 'Valloric/ListToggle'
+Plug 'altercation/vim-colors-solarized'
+Plug 'bkad/CamelCaseMotion'
+Plug 'brookhong/cscope.vim'
+Plug 'godlygeek/tabular'
+Plug 'scrooloose/nerdtree'
+Plug 'tommcdo/vim-exchange'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'wincent/command-t', { 'do': 'cd ruby/command-t/ext/command-t && ruby extconf.rb && make' } " {{{{
 
-call vundle#begin()
-Plugin 'VundleVim/Vundle.vim' " Required for Vundle Bootstrap
-Plugin 'scrooloose/nerdtree'
-Plugin 'wincent/command-t'
-Plugin 'Valloric/YouCompleteMe'
-Plugin 'Valloric/ListToggle'
-Plugin 'tpope/vim-surround'
-Plugin 'bkad/CamelCaseMotion'
-Plugin 'godlygeek/tabular'
-Plugin 'altercation/vim-colors-solarized'
-Plugin 'honza/vim-snippets'
-Plugin 'tpope/vim-abolish'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-commentary'
-Plugin 'brookhong/cscope.vim'
-Plugin 'tommcdo/vim-exchange'
-Plugin 'vim-scripts/Conque-GDB'
-Plugin 'vim-airline/vim-airline' " this should always be last
-Plugin 'vim-airline/vim-airline-themes'
+let g:CommandTMaxHeight=0          " maximize window size
+let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
+let g:CommandTScanDotDirectories=1 " scan dot-directories too
+let g:CommandTFileScanner='find'   " much faster than baked in file finder
+let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs"
 
-" master is broken, managing stable releases manually
-Plugin 'SirVer/ultisnips'
-call vundle#end()
-
-" Required after adding plugins
-filetype plugin indent on
-syntax on
+" }}}
+Plug 'SirVer/ultisnips'
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer'}
+call plug#end() " sets: filetype plugin indent on | syntax enable
 
 "   }}}
 "   Miscellany ------------------------------------------------------------- {{{
@@ -68,21 +69,21 @@ inoremap kj <esc>
 
 " Enable the alt meta key in terminal vim
 " set the timeout for escaped meta keys in ms
-if !has("gui_running")
-    let c='a'
-    while c <= 'z'
-        exec "set <A-".c.">=\e".c
-        exec "imap \e".c." <A-".c.">"
-        let c = nr2char(1+char2nr(c))
-    endw
+" if !has("gui_running")
+"     let c='a'
+"     while c <= 'z'
+"         exec "set <M-".c.">=\e".c
+"         exec "imap \e".c." <A-".c.">"
+"         let c = nr2char(1+char2nr(c))
+"     endw
 
-    let c='A'
-    while c <= 'Z'
-        exec "set <A-".c.">=\e".c
-        exec "imap \e".c." <A-".c.">"
-        let c = nr2char(1+char2nr(c))
-    endw
-endif
+"     let c='A'
+"     while c <= 'Z'
+"         exec "set <M-".c.">=\e".c
+"         exec "imap \e".c." <A-".c.">"
+"         let c = nr2char(1+char2nr(c))
+"     endw
+" endif
 
 " dt between <esc> and <char> to interpret as <A-char>, vs <esc><char>
 set timeout ttimeoutlen=50
@@ -107,13 +108,14 @@ set autowrite                  "auto save when moving away via ^], fe
 set autowriteall               "same, but for :edit and family
 set title                      "use a title
 set ignorecase smartcase       "use smart case searching
-set nocursorline               "disable the cursor line (slows vim down)
+set cursorline                 "disable if syntax highlighting is too slow
 set whichwrap=                 "no keys can wrap lines in normal/visual
 set hlsearch incsearch         "highlight as we go
 set history=1000               "keep a longer ex history
 set undoreload=1000            "keep a longer undo history
 set backspace=indent,eol,start "let insert mode backspace be useful
 set colorcolumn=+1             "highilight the column after the textwidth value
+set synmaxcol=256              "ignore syntax after column 256
 set nrformats=octal,hex,alpha  "make ^x and ^a intelligent
 set scrolloff=10               "keep at least 10 lines above/below cursor
 set virtualedit=block          "Let block visual go past EOL
@@ -402,10 +404,10 @@ noremap gL g_
 nnoremap <S-k> i<cr><esc>
 
 " <A-h> and <A-l> move the line or selection up or down
-nnoremap <A-l> :m .+1<CR>==
-nnoremap <A-h> :m .-2<CR>==
-vnoremap <A-l> :m '>+1<CR>gv=gv
-vnoremap <A-h> :m '<-2<CR>gv=gv
+nnoremap <A-down> :m .+1<CR>==
+nnoremap <A-up>   :m .-2<CR>==
+vnoremap <A-down> :m '>+1<CR>gv=gv
+vnoremap <A-up>   :m '<-2<CR>gv=gv
 
 " <A-j> and <A-k> add an empty line above or below the current
 nnoremap <silent><A-j> :set paste<CR>m`o<Esc>``:set nopaste<CR>
@@ -424,12 +426,10 @@ noremap! <A-k> <up>
 "   Auto-Close Members ----------------------------------------------------- {{{
 "TODO these need to be remapped, interfere with camel case motion
 
-" In classes, functions, and scopes, we need more fine grained rules for braces
-" <leader>c puts { on a new line, and }; on a new line
-" <leader>f puts { on a new line, and } on a new line
-" <leader>e puts { at the end of this line, and } on a new line
-nnoremap <silent> <localleader>{ :call StripTrailingWhitespaces()<CR>o{<CR>};<C-o>O
-nnoremap <silent> <localleader>} :call StripTrailingWhitespaces()<CR>o{<CR>}<C-o>O
+" These are so common it makes sense to have an easier mapping than surround.vim
+" mnemonic: s - scope
+nnoremap <silent> <localleader>S :call StripTrailingWhitespaces()<CR>o{<CR>};<C-o>O
+nnoremap <silent> <localleader>s :call StripTrailingWhitespaces()<CR>o{<CR>}<C-o>O
 
 " use a double ';' to end the line
 nnoremap ;; A;<esc>
@@ -474,6 +474,18 @@ endfunction " }}}
 
 vnoremap * :<C-u>call <SID>VSetSearch()<CR>//<CR><c-o>
 vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
+
+" I never used the default behavior anyways
+nnoremap ][ ]m
+nnoremap ]] ]M
+nnoremap [[ [m
+nnoremap [] [M
+
+" Easier time getting around windows
+nnoremap <silent> <c-h> :wincmd h<cr>
+nnoremap <silent> <c-j> :wincmd j<cr>
+nnoremap <silent> <c-k> :wincmd k<cr>
+nnoremap <silent> <c-l> :wincmd l<cr>
 
 "   }}}
 "   Folding ---------------------------------------------------------------- {{{
@@ -524,14 +536,6 @@ set foldtext=MyFoldText()
 vnoremap <leader>gg y:grep -Hrn '<c-r>0' .<cr>:copen<cr>
 
 "   }}}
-"   Error Checking --------------------------------------------------------- {{{
-
-" Use <l>dt to check the file for errors, and populate the loclist with them
-" TODO this goes in YCM configs
-nnoremap <silent> <leader>di :YcmDiags<cr>
-let g:ycm_key_detailed_diagnostics = '<leader>dt'
-
-"   }}}
 "   Ctags ------------------------------------------------------------------ {{{
 
 function! RegenerateTags() " {{{
@@ -567,6 +571,20 @@ function! GtestFixtureName() " {{{
 endfunction " }}}
 
 vnoremap <silent> <localleader>gt :call GtestFixtureName()<cr>
+
+"   }}}
+"   Alignment/Whitespace --------------------------------------------------- {{{
+
+" better alignemnt for doxygen parameters
+command! Params call Params()
+
+" remove trailing whitespaces
+command! Whitespace call StripTrailingWhitespaces()
+
+function! Params() " {{{
+    call Tabularize("params1")
+    call Tabularize("params2")
+endfunction " }}}
 
 "   }}}
 " }}}
@@ -631,22 +649,30 @@ nnoremap <leader>snip :UltiSnipsEdit!<cr>
 " TODO evaluate
 
 let g:ycm_collect_identifiers_from_tags_files = 1       " use tags files
+let g:ycm_autoclose_preview_window_after_completion = 0 " leave window open until we leave insert
 let g:ycm_autoclose_preview_window_after_insertion = 1  " leave window open until we leave insert
-" let g:ycm_autoclose_preview_window_after_completion = 1 " leave window open until we leave insert
 let g:ycm_seed_identifiers_with_syntax = 1              " seed ycm completions
 let g:ycm_confirm_extra_conf = 0                        " stop asking if I want to use or not
 let g:ycm_goto_buffer_command = 'vertical-split'        " open in v-split
 " let g:ycm_auto_trigger = 0                            " Disable if completions are slow
-let g:ycm_key_invoke_completion = '<A-Space>'           " map the manual trigger
+let g:ycm_key_invoke_completion = "<c-l>"               " map the manual trigger
 let g:ycm_server_log_level = 'debug'                    " gives more info in the logs
 
 " convenient for using the YCM engine to jump around to declarations/definitions
 " TODO move to YCM configurations
-nnoremap <silent> <leader>go :YcmCompleter GoTo<cr>
-nnoremap <silent> <leader>ref :YcmCompleter GoToReferences<cr>
-nnoremap <silent> <leader>fi :YcmCompleter FixIt<cr>
-nnoremap <silent> <leader>do :YcmCompleter GetDoc<cr>
-nnoremap <silent> <leader>au :YcmCompleter GetType<cr>
+nnoremap <silent> <localleader>cf :YcmCompleter FixIt<cr>
+nnoremap <silent> <localleader>cd :YcmCompleter GetDoc<cr>
+nnoremap <silent> <localleader>ct :YcmCompleter GetType<cr>
+nnoremap <silent> <localleader>cc :YcmCompleter ClearCompilationFlagCache<cr>
+nnoremap <silent> <localleader>cg :YcmCompleter GoTo<cr>
+nnoremap <silent> <localleader>ci :YcmCompleter GoToDefinition<cr>
+nnoremap <silent> <localleader>cr :YcmRestartServer<cr>
+nnoremap <silent> <localleader>cx :YcmDebugInfo<cr>
+nnoremap <silent> <localleader>ce :YcmDiags<cr>
+nnoremap <silent> <localleader>cm :YcmShowDetailedDiagnostic<cr>
+
+" Use <l>dt to check the file for errors, and populate the loclist with them
+" TODO this goes in YCM configs
 
 "   }}}
 "   CamelCaseMotion -------------------------------------------------------- {{{
@@ -655,24 +681,23 @@ nnoremap <silent> <leader>au :YcmCompleter GetType<cr>
 call camelcasemotion#CreateMotionMappings('<localleader>')
 
 "   }}}
-"   Command-T -------------------------------------------------------------- {{{
-
-let g:CommandTMaxHeight=0          " maximize window size
-let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
-let g:CommandTScanDotDirectories=1 " scan dot-directories too
-let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs"
-let g:CommandTFileScanner='find'
-
-"   }}}
 "   CScope ----------------------------------------------------------------- {{{
 
-nnoremap <leader>fa :call CscopeFindInteractive(expand('<cword>'))<CR>
-vnoremap <leader>fa y:call CscopeFindInteractive(<C-r>")<CR>
+nnoremap <silent> <leader>fa :vsplit<cr>:call CscopeFindInteractive(expand('<cword>'))<cr>
+nnoremap <silent> <leader>fs :vsplit<cr>:call CscopeFind('s', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fg :vsplit<cr>:call CscopeFind('g', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fd :vsplit<cr>:call CscopeFind('d', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fc :vsplit<cr>:call CscopeFind('c', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>ft :vsplit<cr>:call CscopeFind('t', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fe :vsplit<cr>:call CscopeFind('e', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>ff :vsplit<cr>:call CscopeFind('f', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fi :vsplit<cr>:call CscopeFind('i', expand('<cword>'))<cr><cr>
 
-nnoremap <silent> <localleader>] :lnext<cr>
-nnoremap <silent> <localleader>[ :lprev<cr>
+nnoremap <silent> <localleader>p :lnext<cr>
+nnoremap <silent> <localleader>o :lprev<cr>
 
 let g:cscope_silent = 1 " don't remind me every time it updates
+let g:cscope_ignored_dir = '.git$\|external$'
 
 "   }}}
 "   ListToggle ------------------------------------------------------------- {{{
@@ -746,8 +771,8 @@ augroup ALL
 
   " Show trailing characters iff not in insert mode
   " The char here should match the one set in listchars above
-  au InsertEnter * :set listchars-=trail:^
-  au InsertLeave * :set listchars+=trail:^
+  au InsertEnter * if &binary==0 | :set listchars-=trail:^ | endif
+  au InsertLeave * if &binary==0 | :set listchars+=trail:^ | endif
 
   " Return to the same line when opening a file
   au BufReadPost *
@@ -794,6 +819,9 @@ augroup Work
    " Unit Tests
    au BufNewFile,BufRead */work/aismov/* nnoremap <buffer> <localleader>wr :!waf
 
+   "
+   au BufNewFile,BufRead */work/asimov/*.build set ft=sh
+
 augroup END
 "   }}}
 "   Test Space ------------------------------------------------------------- {{{
@@ -806,19 +834,19 @@ augroup END
 augroup Binary
    autocmd!
 
-   " vim -b : edit binary using xxd-format!
-   au BufReadPre  *.bin let &bin=1
+   " vim -b : edit binary using xxd
+   au BufReadPre *.bin setlocal binary | setlocal listchars=
 
    " can't join a line with ! using pipes, all following commands go to terminal
-   au BufReadPost *.bin if &bin | %!xxd
+   au BufReadPost *.bin if &binary | %!xxd
    au BufReadPost *.bin set ft=xxd | endif
 
    " can't join a line with ! using pipes, all following commands go to terminal
-   au BufWritePre *.bin if &bin | %!xxd -r
+   au BufWritePre *.bin if &binary | %!xxd -r
    au BufWritePre *.bin endif
 
    " can't join a line with ! using pipes, all following commands go to terminal
-   au BufWritePost *.bin if &bin | %!xxd
+   au BufWritePost *.bin if &binary | %!xxd
    au BufWritePost *.bin set nomodified | endif
 augroup END
     "

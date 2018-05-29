@@ -19,6 +19,7 @@ function _waf {
              'smc_flash'
              'smc_flash_app'
              'smc_flash_bl'
+             'smc_flash_ssh'
              'smc_gdb'
              'smc_gdb_bl'
              'smc_gdbserver')

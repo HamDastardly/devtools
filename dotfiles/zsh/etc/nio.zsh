@@ -4,12 +4,18 @@
 insert_path $HOME/bin            post
 insert_path $HOME/bin/s32k-tools post
 
-export asimov_ip="10.118.48.133" #default: 172.20.1.12
+export power_switch_ip='10.118.48.131'
+export jlink_ip='10.118.48.132'
+export asimov_ip='10.118.48.133' #default: 172.20.1.12
+export rpi_ip='10.118.48.134'
+export mac_ip='10.118.48.140'
+
+# this hasn't been ported to build_parameters.py yet
+export JLINK_IP=$jlink_ip
 
 ################################################################################
 #                                   Aliases                                    #
 ################################################################################
-alias com="femtocom"
 alias komodo="open -n -a \"komodo gui\"" # can open >1 instance
 
 ################################################################################
@@ -18,7 +24,7 @@ alias komodo="open -n -a \"komodo gui\"" # can open >1 instance
 function asimov-
 {
     work_dir="/Users/Hamilton.Little/work"
-    upload_dir="/root/scp"
+    upload_dir="scp"
     s32k_build_dir="$work_dir/asimov/build/s32k/platform/s32k"
     s32v_build_dir="$work_dir/asimov/build/s32v/platform/s32v"
 
@@ -39,24 +45,24 @@ function asimov-
     # connect to serial devices
     function $0serial-{smc,mcu,me}
     {
+
         case $(print $0 | cut -d '-' -f3) in
-            smc) com $(asimov-ls-smc) -r 115200 ;;
-            mcu) com $(asimov-ls-mcu) -r 115200 ;;
-            me)  com $(asimov-ls-me)  -r 930600 ;;
+            smc) minicom -b 115200 -D $(asimov-ls-smc) ;;
+            mcu) minicom -b 115200 -D $(asimov-ls-mcu) ;;
+            me)  minicom -b 115200 -D $(asimov-ls-me)  ;;
         esac
     }
 
     # network commands
-    function $0{scp,ssh,sftp,ping,key}
+    function $0{scp,ssh,sftp,ping}
     {
-        local asimov_ssh_opts="-o StrictHostKeyChecking=no"
+        local options="-o StrictHostKeyChecking=no"
 
         case $(print $0 | cut -d '-' -f2) in
             ping) ping -c2 -t2 -o $asimov_ip ;;
-            ssh)  retry asimov-ping; ssh         $asimov_ssh_opts        root@$asimov_ip ${@:1}                            ;;
-            scp)  retry asimov-ping; scp         $asimov_ssh_opts ${@:1} root@$asimov_ip:$upload_dir/$(basename ${@:1})    ;;
-            sftp) retry asimov-ping; sftp        $asimov_ssh_opts        root@$asimov_ip                                   ;;
-            key)  retry asimov-ping; ssh-copy-id $asimov_ssh_opts        root@$asimov_ip; ssh-keygen -R $asimov_ip         ;;
+            ssh)  retry asimov-ping; ssh  $options        root@$asimov_ip ${@:1}       ;;
+            scp)  retry asimov-ping; scp  $options ${@:1} root@$asimov_ip:$upload_dir/ ;;
+            sftp) retry asimov-ping; sftp $options        root@$asimov_ip              ;;
         esac
     }
 
@@ -190,17 +196,20 @@ function asimov-
                 tmux split-window -v -p20
                 tmux select-pane -t1
                 tmux send-keys "slog.sh -sfaw" Enter
-                tmux split-window -h -p20
+                tmux split-window -h -p30
                 tmux select-pane -t2
-                tmux send-keys "can-keep-alive" Enter
+                tmux send-keys "rpi-ssh" Enter "can.sh 0 1 2 3 4 5" Enter
+                tmux split-window -v
+                tmux select-pane -t3
+                tmux send-keys "rpi-ssh" Enter "kcontrol.py" Enter
                 # serial consoles - RHS split
                 tmux select-pane -t0
                 tmux split-window -h
                 tmux select-pane -t1
-                tmux send-keys "asimov-serial-smc" Enter
+                tmux send-keys "sleep 2s" Enter "rpi-ssh" Enter "asimov-serial-smc" Enter
                 tmux split-window -v
                 tmux select-pane -t2
-                tmux send-keys "asimov-serial-mcu" Enter
+                tmux send-keys "sleep 2s" Enter "rpi-ssh" Enter "asimov-serial-mcu" Enter
                 # LHS ssh
                 tmux select-pane -t0
                 tmux send-keys "ssh.sh" Enter
@@ -222,7 +231,19 @@ function asimov-
         esac
     }
 }
-
-# Call it once so parser is pre-loaded with asimov-* completions
-# There should be a workaround the lazy evaluator in zsh, but im too lazy
 asimov-
+
+function rpi-
+{
+    # network commands
+    function $0{scp,ssh,sftp,ping}
+    {
+        case $(print $0 | cut -d '-' -f2) in
+            ping) ping -c2 -t2 -o $rpi_ip ;;
+            ssh)  retry rpi-ping; ssh         hamilton@$rpi_ip ${@:1}       ;;
+            scp)  retry rpi-ping; scp  ${@:1} hamilton@$rpi_ip:$upload_dir/ ;;
+            sftp) retry rpi-ping; sftp        hamilton@$rpi_ip              ;;
+        esac
+    }
+}
+rpi-

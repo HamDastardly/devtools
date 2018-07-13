@@ -29,3 +29,7 @@ stty -ixon
 
 # cd to last directory ranger had open
 alias ranger='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+
+# enable color in minicom
+MINICOM='-c on'
+export MINICOM

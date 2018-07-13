@@ -47,6 +47,7 @@ let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs"
 
 " }}}
 Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer'}
 call plug#end() " sets: filetype plugin indent on | syntax enable
 
@@ -326,13 +327,16 @@ nnoremap <leader>vv
             \:source $MYVIMRC<cr>
 
 "   }}}
-"   Toggling UI Options ---------------------------------------------------- {{{
+"   UI --------------------------------------------------------------- {{{
 
 " , toggles the cursor line
 nnoremap <silent> <leader>, :set cursorline!<cr>
 
 " . toggles line numbers
 nnoremap <silent> <leader>. :call CycleLineNumbers()<cr>
+
+" when numpad is on, l == 6
+nnoremap <silent> <leader>r :redraw!<cr>
 
 function! CycleLineNumbers() " {{{
     if &number == "nonumber"
@@ -477,9 +481,13 @@ vnoremap # :<C-u>call <SID>VSetSearch()<CR>??<CR><c-o>
 
 " I never used the default behavior anyways
 nnoremap ][ ]m
+vnoremap ][ ]m
 nnoremap ]] ]M
+vnoremap ]] ]M
 nnoremap [[ [m
+vnoremap [[ [m
 nnoremap [] [M
+vnoremap [] [M
 
 " Easier time getting around windows
 nnoremap <silent> <c-h> :wincmd h<cr>
@@ -573,7 +581,7 @@ endfunction " }}}
 vnoremap <silent> <localleader>gt :call GtestFixtureName()<cr>
 
 "   }}}
-"   Alignment/Whitespace --------------------------------------------------- {{{
+"   Alignment/Whitespace/Newlines ------------------------------------------ {{{
 
 " better alignemnt for doxygen parameters
 command! Params call Params()
@@ -581,9 +589,15 @@ command! Params call Params()
 " remove trailing whitespaces
 command! Whitespace call StripTrailingWhitespaces()
 
+command! Newlines execute "normal! /\\v^.*((f)?printf)(.*\\\\n.*)@!.*$<cr>"
+
 function! Params() " {{{
     call Tabularize("params1")
     call Tabularize("params2")
+endfunction " }}}
+
+function! FindMissingNewlines() " {{{
+
 endfunction " }}}
 
 "   }}}
@@ -660,16 +674,16 @@ let g:ycm_server_log_level = 'debug'                    " gives more info in the
 
 " convenient for using the YCM engine to jump around to declarations/definitions
 " TODO move to YCM configurations
-nnoremap <silent> <localleader>cf :YcmCompleter FixIt<cr>
-nnoremap <silent> <localleader>cd :YcmCompleter GetDoc<cr>
-nnoremap <silent> <localleader>ct :YcmCompleter GetType<cr>
-nnoremap <silent> <localleader>cc :YcmCompleter ClearCompilationFlagCache<cr>
-nnoremap <silent> <localleader>cg :YcmCompleter GoTo<cr>
-nnoremap <silent> <localleader>ci :YcmCompleter GoToDefinition<cr>
-nnoremap <silent> <localleader>cr :YcmRestartServer<cr>
-nnoremap <silent> <localleader>cx :YcmDebugInfo<cr>
-nnoremap <silent> <localleader>ce :YcmDiags<cr>
-nnoremap <silent> <localleader>cm :YcmShowDetailedDiagnostic<cr>
+nnoremap <silent> <leader>cf :YcmCompleter FixIt<cr>
+nnoremap <silent> <leader>cd :YcmCompleter GetDoc<cr>
+nnoremap <silent> <leader>ct :YcmCompleter GetType<cr>
+nnoremap <silent> <leader>cc :YcmCompleter ClearCompilationFlagCache<cr>
+nnoremap <silent> <leader>co :YcmCompleter GoTo<cr>
+nnoremap <silent> <leader>cg :YcmCompleter GoToDefinition<cr>
+nnoremap <silent> <leader>cr :YcmRestartServer<cr>
+nnoremap <silent> <leader>cx :YcmDebugInfo<cr>
+nnoremap <silent> <leader>ce :YcmDiags<cr>
+nnoremap <silent> <leader>cm :YcmShowDetailedDiagnostic<cr>
 
 " Use <l>dt to check the file for errors, and populate the loclist with them
 " TODO this goes in YCM configs
@@ -683,7 +697,7 @@ call camelcasemotion#CreateMotionMappings('<localleader>')
 "   }}}
 "   CScope ----------------------------------------------------------------- {{{
 
-nnoremap <silent> <leader>fa :vsplit<cr>:call CscopeFindInteractive(expand('<cword>'))<cr>
+nnoremap <silent> <leader>fa :call CscopeFindInteractive(expand('<cword>'))<cr>
 nnoremap <silent> <leader>fs :vsplit<cr>:call CscopeFind('s', expand('<cword>'))<cr><cr>
 nnoremap <silent> <leader>fg :vsplit<cr>:call CscopeFind('g', expand('<cword>'))<cr><cr>
 nnoremap <silent> <leader>fd :vsplit<cr>:call CscopeFind('d', expand('<cword>'))<cr><cr>

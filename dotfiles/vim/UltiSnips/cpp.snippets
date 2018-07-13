@@ -74,7 +74,7 @@ for (${1:auto} ${2:x} : ${3:y})
 endsnippet
 
 snippet for "For Loop" b
-for (${1:size_t} ${2:ndx} = 0; $2 < ${3:limit}; ++$2)
+for (${1:size_t} ${2:ndx} = 0; $2 < ${3:limit}; ${4:++$2})
 {
 	$0${VISUAL}
 }
@@ -154,7 +154,7 @@ namespace ${1:namespace} {
 endsnippet
 
 snippet noopt "No Optimization" w
-__attribute__ ((optimize("-O0")))
+__attribute__ ((optnone))
 endsnippet
 
 snippet com "Comment" b
@@ -162,7 +162,7 @@ snippet com "Comment" b
 endsnippet
 
 snippet debug "Debug Printf" b
-printf("%s:%d\n", __FUNCTION__, __LINE__);
+fprintf(stderr, "%s:%d\n", __FUNCTION__, __LINE__);
 endsnippet
 
 snippet def "#define" b
@@ -187,6 +187,7 @@ $0${VISUAL}
 #endif
 endsnippet
 
+### NIO ###
 snippet lic "license" b
 /*
  * Copyright (c) 2018, NIO USA, Inc.  All rights reserved.
@@ -198,4 +199,8 @@ snippet lic "license" b
  * Any licensed derivative work must retain this notice.
  *
  */
+endsnippet
+
+snippet break "CM4 breakpoint" b
+__asm volatile ("bkpt 0");
 endsnippet

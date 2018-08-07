@@ -187,20 +187,22 @@ $0${VISUAL}
 #endif
 endsnippet
 
-### NIO ###
-snippet lic "license" b
-/*
- * Copyright (c) 2018, NIO USA, Inc.  All rights reserved.
- *
- * Any use, reproduction, distribution, and/or transfer of this file is strictly
- * prohibited without the express written permission of the current copyright
- * owner.
- *
- * Any licensed derivative work must retain this notice.
- *
- */
-endsnippet
-
 snippet break "CM4 breakpoint" b
 __asm volatile ("bkpt 0");
+endsnippet
+
+snippet tds "typedef struct" b
+typedef struct
+{
+	$0
+}
+${1:${VISUAL}};
+endsnippet
+
+snippet tde "typedef struct" b
+typedef enum
+{
+	$0
+}
+${1:${VISUAL}};
 endsnippet

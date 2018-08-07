@@ -27,7 +27,22 @@ call plug#begin('~/.nvim/plugins/')
 Plug 'Valloric/ListToggle'
 Plug 'altercation/vim-colors-solarized'
 Plug 'bkad/CamelCaseMotion'
-Plug 'brookhong/cscope.vim'
+Plug 'mileszs/ack.vim' " {{{
+
+if executable('ag')
+    let g:ackprg = 'ag --vimgrep'
+endif
+
+" }}}
+Plug 'brookhong/cscope.vim' " {{{
+
+let g:cscope_auto_update = 0   " yes, automatically update...
+let g:cscope_silent = 1        " ...but don't bother me about it
+let g:cscope_open_location = 0 " don't open location list by default
+let g:cscope_ignored_dir = '.git$\|build$'
+let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$'
+
+" }}}
 Plug 'godlygeek/tabular'
 Plug 'scrooloose/nerdtree'
 Plug 'tommcdo/vim-exchange'
@@ -709,9 +724,6 @@ nnoremap <silent> <leader>fi :vsplit<cr>:call CscopeFind('i', expand('<cword>'))
 
 nnoremap <silent> <localleader>p :lnext<cr>
 nnoremap <silent> <localleader>o :lprev<cr>
-
-let g:cscope_silent = 1 " don't remind me every time it updates
-let g:cscope_ignored_dir = '.git$\|external$'
 
 "   }}}
 "   ListToggle ------------------------------------------------------------- {{{

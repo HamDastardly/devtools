@@ -1,8 +1,8 @@
+#!/usr/bin/env bash
 set -x -e
-source commands.sh
 
-pushd "${SRC_DIR}"
-$GIT_CLONE https://github.com/powerline/fonts powerline-fonts
-cd powerline-fonts
+git clone https://github.com/powerline/fonts.git fonts
+cd fonts
 ./install.sh
-popd
+cd ..
+rm -rf fonts

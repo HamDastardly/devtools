@@ -28,7 +28,7 @@ function chext
 stty -ixon
 
 # cd to last directory ranger had open
-alias ranger='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
+alias ranger='ranger --choosedir=$HOME/.rangerdir; cd $(cat $HOME/.rangerdir)'
 
 # enable color in minicom
 MINICOM='-c on'

@@ -4,12 +4,12 @@
 function profile-
 {
     #profile-*
-    function $0{zsh,tmux,nio}
+    function $0{zsh,tmux,loft}
     {
         case $(print $0 | cut -d '-' -f2) in
-            zsh)  $EDITOR ~/.zsh             ; reload-zsh  ;;
-            tmux) $EDITOR ~/.tmux.conf       ; reload-tmux ;;
-            nio)  $EDITOR ~/.zsh/etc/nio.zsh ; reload-zsh  ;;
+            zsh)  $EDITOR ~/.zshrc                    ; reload-zsh  ;;
+            tmux) $EDITOR ~/.tmux.conf                ; reload-tmux ;;
+            loft)  $EDITOR ~/.config/zsh/etc/loft.zsh ; reload-zsh  ;;
         esac
     }
 }

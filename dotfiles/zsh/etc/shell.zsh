@@ -1,5 +1,7 @@
-# retry until return code is 0
+insert_path /usr/local/bin post
+insert_path $HOME/bin      post
 
+# retry until return code is 0
 function retry
 {
     until ($@); do :; done

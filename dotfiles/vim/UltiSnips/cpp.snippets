@@ -74,7 +74,7 @@ for (${1:auto} ${2:x} : ${3:y})
 endsnippet
 
 snippet for "For Loop" b
-for (${1:size_t} ${2:ndx} = 0; $2 < ${3:limit}; ${4:++$2})
+for (${1:unsigned} ${2:ndx} = 0; $2 < ${3:limit}; ${4:++$2})
 {
 	$0${VISUAL}
 }
@@ -92,6 +92,10 @@ ${1:`!p snip.rv = match.group(2) if match.group(1) is not None else "vector"`}.b
 endsnippet
 
 snippet dc "Doxygen Comment" b
+/** $0 */
+endsnippet
+
+snippet dcb "Doxygen Comment (with brief)" b
 /** \brief $0 */
 endsnippet
 
@@ -191,6 +195,10 @@ snippet break "CM4 breakpoint" b
 __asm volatile ("bkpt 0");
 endsnippet
 
+snippet td "typedef" b
+typedef ${1:uint32_t} ${2:FourBillion};
+endsnippet
+
 snippet tds "typedef struct" b
 typedef struct
 {
@@ -199,10 +207,21 @@ typedef struct
 ${1:${VISUAL}};
 endsnippet
 
-snippet tde "typedef struct" b
+snippet tde "typedef enum" b
 typedef enum
 {
 	$0
 }
 ${1:${VISUAL}};
+endsnippet
+
+snippet lic "Description" b
+/* License...
+ *
+ * lorem ipsum dolor sit amet
+ */
+endsnippet
+
+snippet todo "Doxygen TODO" b
+/// TODO (Hamilton) $0
 endsnippet

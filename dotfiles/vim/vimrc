@@ -18,12 +18,16 @@
 "   Pre-Initialization ----------------------------------------------------- {{{
 
 " must be set before loading plugins
-let g:python_host_prog = '/usr/local/bin/python'
+let g:python_host_prog = '/usr/bin/python'
+let g:python_host_prog = '/usr/bin/python3'
+let g:ruby_host_prog = '~/.rbenv/shims/neovim-ruby-host'
 
 "   }}}
 "   Installed Plugins ------------------------------------------------------ {{{
 
+" set options here, but mappings must be made outside the #begin/#end tags
 call plug#begin('~/.nvim/plugins/')
+Plug 'junegunn/vim-plug' " get the documentation in vim
 Plug 'Valloric/ListToggle'
 Plug 'altercation/vim-colors-solarized'
 Plug 'bkad/CamelCaseMotion'
@@ -39,7 +43,7 @@ Plug 'brookhong/cscope.vim' " {{{
 let g:cscope_auto_update = 0   " yes, automatically update...
 let g:cscope_silent = 1        " ...but don't bother me about it
 let g:cscope_open_location = 0 " don't open location list by default
-let g:cscope_ignored_dir = '.git$\|build$'
+let g:cscope_ignored_dir = '.git$\|build$\|unit_test$\|unit-test$\|utf$\|ut_assert$'
 let g:cscope_interested_files = '\.c$\|\.cpp$\|\.h$\|\.hpp$'
 
 " }}}
@@ -52,7 +56,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'wincent/command-t', { 'do': 'cd ruby/command-t/ext/command-t && ruby extconf.rb && make' } " {{{{
+Plug 'wincent/command-t', { 'do': 'cd ruby/command-t/ext/command-t && ruby extconf.rb && make' } " {{{
 
 let g:CommandTMaxHeight=0          " maximize window size
 let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
@@ -63,7 +67,15 @@ let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs"
 " }}}
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer'}
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+
+Plug 'shime/vim-livedown', { 'do': 'sudo npm install -g livedown' } " {{{
+
+let g:livedown_autorun = 0
+let g:livedown_open = 1
+let g:livedown_port = 1337
+
+" }}}
 call plug#end() " sets: filetype plugin indent on | syntax enable
 
 "   }}}
@@ -131,7 +143,7 @@ set history=1000               "keep a longer ex history
 set undoreload=1000            "keep a longer undo history
 set backspace=indent,eol,start "let insert mode backspace be useful
 set colorcolumn=+1             "highilight the column after the textwidth value
-set synmaxcol=256              "ignore syntax after column 256
+set synmaxcol=512              "ignore syntax after column 256
 set nrformats=octal,hex,alpha  "make ^x and ^a intelligent
 set scrolloff=10               "keep at least 10 lines above/below cursor
 set virtualedit=block          "Let block visual go past EOL
@@ -239,7 +251,7 @@ function! SetCInOptions() " {{{
     set cinoptions+=:0  " keep case label indentation with switch() statement
     " set cinoptions==  " no extra indent for statements following ^^^
     set cinoptions+=l1  " align to case label as if it were a {
-    " set cinoptions=b0 " align break surrounding text
+    set cinoptions+=b1  " align break with case label (makes a visual block)
     set cinoptions+=g0  " (public:|private:|protected:) indent to class statement
     " set cinoptions=h  " no extra indent for statements following ^^^
     set cinoptions+=N-s " remove indent following a namespace declaration
@@ -282,6 +294,7 @@ endfunction " }}}
 
 " Cindent gets configured here, and enabled in the autocommand groups for c/cpp
 call SetCInOptions()
+set cinkeys+=0=break
 
 " only use 1 space after a punctuation mark {.?!}
 set nojoinspaces
@@ -551,12 +564,8 @@ endfunction " }}}
 set foldtext=MyFoldText()
 
 "   }}}
-"   Advanced Grep ---------------------------------------------------------- {{{
-" <leader>gg
-"   1. Recursively greps for the word under the cursor
-"   2. Populates the quickfix list
-"   3. Opens the quickfix window for jumping to occurences
-vnoremap <leader>gg y:grep -Hrn '<c-r>0' .<cr>:copen<cr>
+"   Ack -------------------------------------------------------------------- {{{
+nnoremap <leader>ak :Ack <cword><cr>
 
 "   }}}
 "   Ctags ------------------------------------------------------------------ {{{
@@ -651,7 +660,7 @@ nnoremap <c-f> :NERDTreeFind<cr>
 
 " <leader>al mnemonic is "align"
 nnoremap <leader>al :Tabularize /
-vnoremap <leader>al y:Tabularize /<C-r>"<cr>
+vnoremap <leader>al :Tabularize /
 
 "   }}}
 "   UltiSnips -------------------------------------------------------------- {{{
@@ -683,7 +692,7 @@ let g:ycm_autoclose_preview_window_after_insertion = 1  " leave window open unti
 let g:ycm_seed_identifiers_with_syntax = 1              " seed ycm completions
 let g:ycm_confirm_extra_conf = 0                        " stop asking if I want to use or not
 let g:ycm_goto_buffer_command = 'vertical-split'        " open in v-split
-" let g:ycm_auto_trigger = 0                            " Disable if completions are slow
+let g:ycm_auto_trigger = 1                              " Disable if completions are slow
 let g:ycm_key_invoke_completion = "<c-l>"               " map the manual trigger
 let g:ycm_server_log_level = 'debug'                    " gives more info in the logs
 
@@ -755,6 +764,11 @@ let g:ConqueGdb_Leader      = '<localleader>' " use localleader for keyboard cmd
 
 nnoremap <silent> <localleader>Y :ConqueGdbCommand y<CR>
 nnoremap <silent> <localleader>N :ConqueGdbCommand n<CR>
+
+"   }}}
+"   Livedown --------------------------------------------------------------- {{{
+
+nnoremap <silent> <leader>gm :LivedownToggle<CR>
 
 "   }}}
 " }}}
@@ -830,24 +844,17 @@ augroup FileType_c_cpp
    " to edit, use ':UltiSnipsEdit gtest' manually
    au BufRead,BufNewFile *.cpp :UltiSnipsAddFiletypes gtest
 
+   " Set the comment string for cmake files: leading #
+   au FileType cmake setlocal comments=b:#
+   au FileType cmake setlocal commentstring=#\ %s
+
 augroup END
 "   }}}
-"   Work ------------------------------------------------------------------- {{{
-augroup Work
+"   Loft ------------------------------------------------------------------- {{{
+augroup Loft
    autocmd!
 
-   " Build/Flash Images
-   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wc :!waf clean<cr>
-   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wk :!waf build_s32k<cr>
-   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wf :!waf smc_flash<cr>
-   au BufNewFile,BufRead */work/asimov/* nnoremap <buffer> <localleader>wa :!ASIMOV_DISABLE_CAN_SLEEP=1 waf <cr>
-
-   " Unit Tests
-   au BufNewFile,BufRead */work/aismov/* nnoremap <buffer> <localleader>wr :!waf
-
-   "
-   au BufNewFile,BufRead */work/asimov/*.build set ft=sh
-
+   au BufRead,BufNewFile */cosmos/*.txt setlocal ft=ruby
 augroup END
 "   }}}
 "   Test Space ------------------------------------------------------------- {{{

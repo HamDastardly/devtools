@@ -29,9 +29,6 @@ function chext
 # forward <C-s> to terminal program, don't trap it for control flow
 stty -ixon
 
-# cd to last directory ranger had open
-alias ranger='ranger --choosedir=$HOME/.rangerdir; cd $(cat $HOME/.rangerdir)'
-
 # enable color in minicom
 MINICOM='-c on'
 export MINICOM

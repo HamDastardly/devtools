@@ -1,0 +1,2 @@
+! override default X11 settings
+xrdb $HOME/.Xresources

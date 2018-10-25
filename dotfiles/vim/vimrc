@@ -62,7 +62,8 @@ let g:CommandTMaxHeight=0          " maximize window size
 let g:CommandTTraverseSCM='pwd'    " Use pwd as tree root
 let g:CommandTScanDotDirectories=1 " scan dot-directories too
 let g:CommandTFileScanner='find'   " much faster than baked in file finder
-let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs"
+let g:CommandTMaxFiles=500000      " increase the max file limit
+let g:CommandTWildIgnore=&wildignore . ",*/doc,*/docs,*/build"
 
 " }}}
 Plug 'SirVer/ultisnips'
@@ -76,6 +77,10 @@ let g:livedown_open = 1
 let g:livedown_port = 1337
 
 " }}}
+
+Plug 'https://github.com/kergoth/vim-bitbake.git'
+
+Plug 'https://github.com/othree/xml.vim.git'
 call plug#end() " sets: filetype plugin indent on | syntax enable
 
 "   }}}
@@ -542,7 +547,7 @@ nnoremap <c-z> zMzOzz
 "
 " Note: This mapping wipes out the z mark, which I never use, and disables
 "       background vim!
-" nnoremap <c-z> mzzMzvzz`z
+ nnoremap <leader>z mzzMzvzz`z
 
 " Use a nicer folder text method, forget where I got this
 function! MyFoldText() " {{{
@@ -625,6 +630,21 @@ function! FindMissingNewlines() " {{{
 endfunction " }}}
 
 "   }}}
+"   Clipboard Manipulation ------------------------------------------------- {{{
+
+nnoremap <leader>y "*yiw
+nnoremap <leader>Y "+yiw
+
+vnoremap <leader>y "*y
+vnoremap <leader>Y "+y
+
+"   }}}
+"   Loft ------------------------------------------------------------------- {{{
+
+nnoremap <localleader>ma :!scripts/build.sh app<cr>
+nnoremap <localleader>mf :!scripts/build.sh framework<cr>
+
+"   }}}
 " }}}
 " Plugin Mappings and Settings --------------------------------------------- {{{
 "   Airline ---------------------------------------------------------------- {{{
@@ -696,6 +716,8 @@ let g:ycm_auto_trigger = 1                              " Disable if completions
 let g:ycm_key_invoke_completion = "<c-l>"               " map the manual trigger
 let g:ycm_server_log_level = 'debug'                    " gives more info in the logs
 
+let g:ycm_global_ycm_extra_conf = '/home/hamilton/.config/nvim/ycm_extra_conf.py'
+
 " convenient for using the YCM engine to jump around to declarations/definitions
 " TODO move to YCM configurations
 nnoremap <silent> <leader>cf :YcmCompleter FixIt<cr>
@@ -722,14 +744,14 @@ call camelcasemotion#CreateMotionMappings('<localleader>')
 "   CScope ----------------------------------------------------------------- {{{
 
 nnoremap <silent> <leader>fa :call CscopeFindInteractive(expand('<cword>'))<cr>
-nnoremap <silent> <leader>fs :vsplit<cr>:call CscopeFind('s', expand('<cword>'))<cr><cr>
-nnoremap <silent> <leader>fg :vsplit<cr>:call CscopeFind('g', expand('<cword>'))<cr><cr>
-nnoremap <silent> <leader>fd :vsplit<cr>:call CscopeFind('d', expand('<cword>'))<cr><cr>
-nnoremap <silent> <leader>fc :vsplit<cr>:call CscopeFind('c', expand('<cword>'))<cr><cr>
-nnoremap <silent> <leader>ft :vsplit<cr>:call CscopeFind('t', expand('<cword>'))<cr><cr>
-nnoremap <silent> <leader>fe :vsplit<cr>:call CscopeFind('e', expand('<cword>'))<cr><cr>
-nnoremap <silent> <leader>ff :vsplit<cr>:call CscopeFind('f', expand('<cword>'))<cr><cr>
-nnoremap <silent> <leader>fi :vsplit<cr>:call CscopeFind('i', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fs :split<cr>:call CscopeFind('s', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fg :split<cr>:call CscopeFind('g', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fd :split<cr>:call CscopeFind('d', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fc :split<cr>:call CscopeFind('c', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>ft :split<cr>:call CscopeFind('t', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fe :split<cr>:call CscopeFind('e', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>ff :split<cr>:call CscopeFind('f', expand('<cword>'))<cr><cr>
+nnoremap <silent> <leader>fi :split<cr>:call CscopeFind('i', expand('<cword>'))<cr><cr>
 
 nnoremap <silent> <localleader>p :lnext<cr>
 nnoremap <silent> <localleader>o :lprev<cr>
@@ -769,6 +791,16 @@ nnoremap <silent> <localleader>N :ConqueGdbCommand n<CR>
 "   Livedown --------------------------------------------------------------- {{{
 
 nnoremap <silent> <leader>gm :LivedownToggle<CR>
+
+"   }}}
+"   XML -------------------------------------------------------------------- {{{
+
+let g:xml_syntax_folding=1
+
+"   }}}
+"   CommandT --------------------------------------------------------------- {{{
+
+nnoremap <silent> <leader>u :CommandTMRU<cr>
 
 "   }}}
 " }}}
@@ -855,6 +887,8 @@ augroup Loft
    autocmd!
 
    au BufRead,BufNewFile */cosmos/*.txt setlocal ft=ruby
+
+
 augroup END
 "   }}}
 "   Test Space ------------------------------------------------------------- {{{
@@ -920,6 +954,12 @@ augroup FileType_vim
                 \ <C-w><Enter><C-w>L
                 \:cclose<CR>:copen<CR>
 
+augroup END
+"   }}}
+"   XML -------------------------------------------------------------------- {{{
+augroup FileType_xml
+
+    au FileType xml setlocal foldmethod=syntax
 augroup END
 "   }}}
 " }}}

@@ -32,3 +32,5 @@ stty -ixon
 # enable color in minicom
 MINICOM='-c on'
 export MINICOM
+
+alias tmux='tmux -2'

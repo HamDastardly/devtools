@@ -33,4 +33,7 @@ stty -ixon
 MINICOM='-c on'
 export MINICOM
 
-alias tmux='tmux -2'
+# alias tmux='TERM=xterm-256color tmux -2'
+
+# save coredumps when they occur
+ulimit -c unlimited

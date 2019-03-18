@@ -99,7 +99,16 @@ snippet dcb "Doxygen Comment (with brief)" b
 /** \brief $0 */
 endsnippet
 
+snippet db "Doxygen brief" w
+\brief $0
+endsnippet
+
 snippet dfc "Doxygen File Comment" b
+/** \file */
+$0
+endsnippet
+
+snippet dfcb "Doxygen File Comment with brief" b
 /** \file
  *
  * \brief $0 */
@@ -119,6 +128,10 @@ endsnippet
 
 snippet dr "Doxygen return" w
 \return $0
+endsnippet
+
+snippet drv "Doxygen retval" w
+\retval $0
 endsnippet
 
 snippet switch "Switch Statement" w
@@ -166,7 +179,7 @@ snippet com "Comment" b
 endsnippet
 
 snippet debug "Debug Printf" b
-fprintf(stderr, "%s:%d\n", __FUNCTION__, __LINE__);
+fprintf(stderr, "%s:%d\n", __FILE__, __LINE__);
 endsnippet
 
 snippet def "#define" b
@@ -215,11 +228,13 @@ typedef enum
 ${1:${VISUAL}};
 endsnippet
 
-snippet lic "Description" b
-/* License...
- *
- * lorem ipsum dolor sit amet
- */
+snippet lic "License header" b
+/*******************************************************************************
+ * Project         Payload Hub > PICU
+ * File            `!p snip.rv = path`
+ * Author          Hamilton Little <hamilton@loftorbital.com>
+ * License         Copyright (C) 2019 by Loft Orbital Solutions
+ ******************************************************************************/
 endsnippet
 
 snippet todo "Doxygen TODO" b

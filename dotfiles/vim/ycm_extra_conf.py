@@ -143,6 +143,7 @@ def FlagsForCompilationDatabase(root, filename):
     try:
         # Last argument of next function is the name of the build folder for
         # out of source projects
+        logging.info("executing search")
         compilation_db_path = FindNearest(root, 'compile_commands.json', BUILD_DIRECTORY)
         compilation_db_dir = os.path.dirname(compilation_db_path)
         logging.info("Set compilation database directory to " + compilation_db_dir)

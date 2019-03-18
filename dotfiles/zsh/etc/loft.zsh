@@ -10,39 +10,34 @@ insert_path $HOME/.local/bin pre
 
 function picu-
 {
-    function $0tmux-all
+    function $0up
     {
-        case $(print $0 | cut -d '-' -f3) in
-            all)
-                cd $HOME/work/picu/
+        cd $HOME/work/picu
 
-                pushd cFS
-                tmux rename-window "FSW"
-                tmux split-window -h -p30
-                tmux select-pane -t0
-                    tmux send-keys "${EDITOR}" Enter
-                tmux select-pane -t1
-                    tmux send-keys "make" Enter
-                popd
+        tmux rename-window "Gen1"
+        tmux split-window -v -p30
+        tmux select-pane -t1
+        tmux split-window -h -p50
 
-                pushd cosmos
-                tmux new-window -n "COSMOS"
-                tmux select-pane -t0
-                    tmux send-keys "${EDITOR}" Enter
-                popd
+        tmux select-pane -t0
+        cd gen1
+        tmux send-keys "${EDITOR} ." Enter
 
-                tmux new-window -n "Console"
-                tmux split-window -h
-                tmux select-pane -t1
-                tmux split-window -v
-                tmux select-pane -t1
-                    tmux send-keys "cd cFS" Enter
-                    tmux send-keys "make install && pushd build/exe/cpu1; ./core-cpu1; popd" Enter
-                tmux select-pane -t2
-                    tmux send-keys "cd cosmos" Enter
-                    tmux send-keys "ruby Launcher" Enter
-                ;;
-        esac
+        tmux select-pane -t1
+        tmux send-keys "docker/build/stop.sh" Enter
+        tmux send-keys "docker/build/start.sh" Enter
+        tmux send-keys "scripts/build.sh vendor:loft" Enter
+        tmux send-keys "scripts/build.sh -c 'make CONFIG=linux -j12 clean' picu:all psp:linux src/deployment/test_deployment" Enter
+        tmux send-keys "scripts/build.sh -c 'make CONFIG=linux -j12 target' picu:all psp:linux src/deployment/test_deployment" Enter
+
+        tmux select-pane -t2
+        tmux send-keys "git status" Enter
     }
 }
 picu-
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/hamilton/tools/google-cloud-sdk/path.zsh.inc' ]; then . '/home/hamilton/tools/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/hamilton/tools/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/hamilton/tools/google-cloud-sdk/completion.zsh.inc'; fi

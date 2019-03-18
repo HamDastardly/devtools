@@ -57,7 +57,7 @@ snippet "(a|e)?ne" "Not Equal" rb
 `!p snip.rv = make_assertion(match.group(1), None, "NE")`(${1:expected}, ${2:${VISUAL:actual}});
 endsnippet
 
-snippet "(a|e)?th" "Not Equal" rb
+snippet "(a|e)?th" "that (hamcrest)" rb
 `!p snip.rv = make_assertion(match.group(1), None, "THAT")`(${1:${VISUAL:actual}}, ${2:matcher});
 endsnippet
 

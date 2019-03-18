@@ -1,3 +1,6 @@
 [submodule "fonts"]
 	path = fonts
 	url = https://github.com/powerline/fonts.git
+[submodule "dotfiles/zsh/plugins/zsh-autosuggestions"]
+	path = dotfiles/zsh/plugins/zsh-autosuggestions
+	url = https://github.com/zsh-users/zsh-autosuggestions

@@ -1,34 +1,34 @@
-" Preamble ----------------------------------------------------------------- {{{
-"   Author ----------------------------------------------------------------- {{{
+    " Preamble ----------------------------------------------------------------- {{{
+    "   Author ----------------------------------------------------------------- {{{
 
-" Author: Hamilton Little
-" Email: hamilton.little@gmail.com
-" Github: https://github.com/HamboLagos
+    " Author: Hamilton Little
+    " Email: hamilton.little@gmail.com
+    " Github: https://github.com/HamboLagos
 
-"   }}}
-"   Note on Operators ------------------------------------------------------ {{{
+    "   }}}
+    "   Note on Operators ------------------------------------------------------ {{{
 
-" nmap: normal           | map (NVO mode)
-" vmap: visual + select  | map (NVO mode)
-" omap: operator pending | map (NVO mode)
-" imap: insert           | map! (IC mode)
-" cmap: command line     | map! (IC mode)
+    " nmap: normal           | map (NVO mode)
+    " vmap: visual + select  | map (NVO mode)
+    " omap: operator pending | map (NVO mode)
+    " imap: insert           | map! (IC mode)
+    " cmap: command line     | map! (IC mode)
 
-"   }}}
-"   Pre-Initialization ----------------------------------------------------- {{{
+    "   }}}
+    "   Pre-Initialization ----------------------------------------------------- {{{
 
-" must be set before loading plugins
-let g:python_host_prog = '/usr/bin/python'
-let g:python_host_prog = '/usr/bin/python3'
-let g:ruby_host_prog = '~/.rbenv/shims/neovim-ruby-host'
+    " must be set before loading plugins
+    let g:python_host_prog = '/usr/bin/python'
+    let g:python_host_prog = '/usr/bin/python3'
+    let g:ruby_host_prog = '~/.rbenv/shims/neovim-ruby-host'
 
-"   }}}
-"   Installed Plugins ------------------------------------------------------ {{{
+    "   }}}
+    "   Installed Plugins ------------------------------------------------------ {{{
 
-" set options here, but mappings must be made outside the #begin/#end tags
-call plug#begin('~/.nvim/plugins/')
-Plug 'junegunn/vim-plug' " get the documentation in vim
-Plug 'Valloric/ListToggle'
+    " set options here, but mappings must be made outside the #begin/#end tags
+    call plug#begin('~/.nvim/plugins/')
+    Plug 'junegunn/vim-plug' " get the documentation in vim
+    Plug 'Valloric/ListToggle'
 Plug 'altercation/vim-colors-solarized'
 Plug 'bkad/CamelCaseMotion'
 Plug 'mileszs/ack.vim' " {{{
@@ -54,6 +54,7 @@ Plug 'tpope/vim-abolish'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
+Plug 'tmhedberg/SimpylFold'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'wincent/command-t', { 'do': 'cd ruby/command-t/ext/command-t && ruby extconf.rb && make' } " {{{
@@ -78,9 +79,13 @@ let g:livedown_port = 1337
 
 " }}}
 
-Plug 'https://github.com/kergoth/vim-bitbake.git'
+Plug 'kergoth/vim-bitbake'
 
-Plug 'https://github.com/othree/xml.vim.git'
+Plug 'othree/xml.vim'
+
+Plug 'jiangmiao/auto-pairs'
+
+let g:AutoPairs={'(':')', '[':']', '{':'}',"'":"'",'"':'"'}
 call plug#end() " sets: filetype plugin indent on | syntax enable
 
 "   }}}
@@ -253,10 +258,10 @@ function! SetCInOptions() " {{{
     " set cinoptions=}  " no extra indent for closing braces
     set cinoptions+=^0  " no extra indent for outermost block
     set cinoptions+=L0  " keep jump statements at the same indent as surroundings
-    set cinoptions+=:0  " keep case label indentation with switch() statement
+    " set cinoptions+=:0" use 1 shiftwidth for case statement
     " set cinoptions==  " no extra indent for statements following ^^^
     set cinoptions+=l1  " align to case label as if it were a {
-    set cinoptions+=b1  " align break with case label (makes a visual block)
+    " set cinoptions+=b1" align break with surrounding code
     set cinoptions+=g0  " (public:|private:|protected:) indent to class statement
     " set cinoptions=h  " no extra indent for statements following ^^^
     set cinoptions+=N-s " remove indent following a namespace declaration
@@ -273,7 +278,7 @@ function! SetCInOptions() " {{{
     "set cinoptions=w   " use first non-white character in an unclosed paren
     set cinoptions+=Ws  " if the first argument is too long, wrap it 1s
     set cinoptions+=ks  " unclosed parens for if, while, etc. get extra indent
-    " set cinoptions=m  " use indentation of opening paren for closing paren
+    " set cinoptions=m1   " line up closing paren on newline with previous indent
     " set cinoptions=M  " use indentation of opening paren for closing paren
     set cinoptions+=j1  " better java and javascript indentation rules
     set cinoptions+=J1  " better java and javascript indentation rules
@@ -363,7 +368,7 @@ nnoremap <leader>vv
 "   UI --------------------------------------------------------------- {{{
 
 " , toggles the cursor line
-nnoremap <silent> <leader>, :set cursorline!<cr>
+nnoremap <silent> <localleader><localleader> :set cursorline!<cr>
 
 " . toggles line numbers
 nnoremap <silent> <leader>. :call CycleLineNumbers()<cr>
@@ -387,6 +392,16 @@ endfunction " }}}
 
 " Visual select the last pasted text
 nnoremap <silent> gp `[v`]
+
+"   }}}
+"   Visual Macro Replay ---------------------------------------------------- {{{
+
+xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
+
+function! ExecuteMacroOverVisualRange()
+  echo "@".getcmdline()
+  execute ":'<,'>normal @".nr2char(getchar())
+endfunction
 
 "   }}}
 "   Highlighting Controls -------------------------------------------------- {{{
@@ -468,9 +483,11 @@ noremap! <A-k> <up>
 nnoremap <silent> <localleader>S :call StripTrailingWhitespaces()<CR>o{<CR>};<C-o>O
 nnoremap <silent> <localleader>s :call StripTrailingWhitespaces()<CR>o{<CR>}<C-o>O
 
-" use a double ';' to end the line
+" double up to stick punctuation at the end of the line
 nnoremap ;; A;<esc>
 inoremap ;; <C-o>A;<esc>
+nnoremap ,, A,<esc>
+inoremap ,, <C-o>A,<esc>
 
 "   }}}
 "   Jump Commands ---------------------------------------------------------- {{{
@@ -530,7 +547,7 @@ nnoremap <silent> <c-l> :wincmd l<cr>
 
 "   }}}
 "   Folding ---------------------------------------------------------------- {{{
-set foldlevelstart=99 " start with 1st level folds open
+set foldlevelstart=0 " start with all folds closed
 
 " Space to toggle folds.
 nnoremap <Space> za
@@ -615,6 +632,10 @@ vnoremap <silent> <localleader>gt :call GtestFixtureName()<cr>
 " better alignemnt for doxygen parameters
 command! Params call Params()
 
+" better alignemnt for fields in c-struct
+" usually have to run a few times
+command! Fields call Fields()
+
 " remove trailing whitespaces
 command! Whitespace call StripTrailingWhitespaces()
 
@@ -623,6 +644,12 @@ command! Newlines execute "normal! /\\v^.*((f)?printf)(.*\\\\n.*)@!.*$<cr>"
 function! Params() " {{{
     call Tabularize("params1")
     call Tabularize("params2")
+endfunction " }}}
+
+function! Fields() " {{{
+    call Tabularize("assignment")
+    call Tabularize("csv")
+    call Tabularize("curlies")
 endfunction " }}}
 
 function! FindMissingNewlines() " {{{
@@ -643,6 +670,61 @@ vnoremap <leader>Y "+y
 
 nnoremap <localleader>ma :!scripts/build.sh app<cr>
 nnoremap <localleader>mf :!scripts/build.sh framework<cr>
+
+" Input
+"   int void function(int param1, int param2)
+" Output
+"   int void function(
+"       int param1,
+"       int param2
+"   )
+command! HamFunction execute "normal! f(a<cr><esc>:s:\\v(\\w.{-}[,)]):\\1\r:g<cr>kJxi<cr><esc><<kVj%=f(%j:nohl"
+command! HamFunctionAll execute "g:\\v^\\w+.*\\(:HamFunction"
+
+command! HamAll execute "HamFunctionAll"
+
+" Input
+"   {
+"   <empty line>
+"       // code
+"   <empty line>
+"   }
+" Output
+"   {
+"       // code
+"   }
+command! LucasBraceSpace execute "%s:\\v^(\\s*\\{)\\n^\\s*$:\\1:g" | execute "%s:\\v^\\s*$\\n^(\\s*\\}):\\1:g"
+command! LucasColonSpace execute "%s:\\v\\s+;:;:g"
+command! LucasSpacesAll execute "Whitespace" | execute "LucasBraceSpace" | execute "LucasColonSpace"
+
+" Input
+"   int void function ( int param1,
+"                       int param2                                             )
+" Output
+"   int void function(
+"       int param1,
+"       int param2
+"   )
+command! LucasFunction execute "normal! f(%i<cr><esc>lV%:s:\\v\\s+: :g<cr><<%hxlxi<cr><esc>Vk^f(%k=" | execute "nohl"
+command! LucasFunctionAll execute "g:\\v^\\w+.*\\(:LucasFunction"
+
+command! LucasAll execute "LucasFunctionAll" | execute "LucasSpacesAll"
+
+" Input
+"   #define                   name         value
+"  Output
+"  #define name value
+command! -range CondenseSpaces execute "'<,'>s:\\v\\s+: :g" | execute "nohl"
+
+" Input
+"   /// @brief                   brief documentation
+"   ///
+"   /// detailed documentation.
+"  Output
+"    /** \brief brief documentation
+"     *
+"     * detailed documentation */
+command! -range LucasDoxy execute "CondenseSpaces" | execute "'<,'>s:\\v\\@:\\\\:" | execute "'<,'>s:///: *:" | execute "'<s:\\v \\*:/**:" | execute "'>s:\\v$: */:" | execute "nohl"
 
 "   }}}
 " }}}
@@ -716,7 +798,7 @@ let g:ycm_auto_trigger = 1                              " Disable if completions
 let g:ycm_key_invoke_completion = "<c-l>"               " map the manual trigger
 let g:ycm_server_log_level = 'debug'                    " gives more info in the logs
 
-let g:ycm_global_ycm_extra_conf = '/home/hamilton/.config/nvim/ycm_extra_conf.py'
+" let g:ycm_global_ycm_extra_conf = '/home/hamilton/.config/nvim/ycm_extra_conf.py'
 
 " convenient for using the YCM engine to jump around to declarations/definitions
 " TODO move to YCM configurations
@@ -803,6 +885,11 @@ let g:xml_syntax_folding=1
 nnoremap <silent> <leader>u :CommandTMRU<cr>
 
 "   }}}
+"   Shell Folding (builtin) -------------------------------------------------- {{{
+
+let g:sh_fold_enabled=1 " enable function folding
+
+"   }}}
 " }}}
 " AutoCommand Groups ------------------------------------------------------- {{{
 "   Aside on Autocommand Triggers ------------------------------------------ {{{
@@ -827,6 +914,9 @@ augroup ALL
 
   " Clear trailing white spaces when entering, saving, or leaving a buffer
   au InsertLeave * if &binary==0 | silent! call StripTrailingWhitespaces() | endif
+
+  " check if another process has modified the file
+  au CursorHold,FocusGained,BufEnter * :checktime
 
   " If we made changes to the file, save them before switching buffers
   au BufLeave,FocusLost * if &modifiable | silent! update | endif
@@ -874,7 +964,8 @@ augroup FileType_c_cpp
    " gtest doesn't show up in the list, due to the setlocal option above
    " however, it still gives me access to the shortcuts
    " to edit, use ':UltiSnipsEdit gtest' manually
-   au BufRead,BufNewFile *.cpp :UltiSnipsAddFiletypes gtest
+   " au BufRead,BufNewFile *.cpp :UltiSnipsAddFiletypes gtest
+   au BufRead,BufNewFile *test*.c :UltiSnipsAddFiletypes unity
 
    " Set the comment string for cmake files: leading #
    au FileType cmake setlocal comments=b:#
@@ -960,6 +1051,14 @@ augroup END
 augroup FileType_xml
 
     au FileType xml setlocal foldmethod=syntax
+    au FileType xml setlocal tabstop=2 shiftwidth=2 softtabstop=2
+augroup END
+"   }}}
+"   YAML ------------------------------------------------------------------- {{{
+augroup FileType_yaml
+
+    au FileType yaml setlocal tabstop=2 shiftwidth=2 softtabstop=2
+
 augroup END
 "   }}}
 " }}}
@@ -1118,7 +1217,7 @@ endfunction " }}}
 hi def IndentGuides guibg=#303030 ctermbg=234
 
 " <leader>i toggles indent guides on or off
-nnoremap <leader>i :call IndentGuides()<cr>
+" nnoremap <leader>i :call IndentGuides()<cr>
 
 "       }}}
 "       Block Colors ------------------------------------------------------- {{{

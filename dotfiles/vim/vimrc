@@ -1,34 +1,34 @@
-    " Preamble ----------------------------------------------------------------- {{{
-    "   Author ----------------------------------------------------------------- {{{
+" Preamble ----------------------------------------------------------------- {{{
+"   Author ----------------------------------------------------------------- {{{
 
-    " Author: Hamilton Little
-    " Email: hamilton.little@gmail.com
-    " Github: https://github.com/HamboLagos
+" Author: Hamilton Little
+" Email: hamilton.little@gmail.com
+" Github: https://github.com/HamboLagos
 
-    "   }}}
-    "   Note on Operators ------------------------------------------------------ {{{
+"   }}}
+"   Note on Operators ------------------------------------------------------ {{{
 
-    " nmap: normal           | map (NVO mode)
-    " vmap: visual + select  | map (NVO mode)
-    " omap: operator pending | map (NVO mode)
-    " imap: insert           | map! (IC mode)
-    " cmap: command line     | map! (IC mode)
+" nmap: normal           | map (NVO mode)
+" vmap: visual + select  | map (NVO mode)
+" omap: operator pending | map (NVO mode)
+" imap: insert           | map! (IC mode)
+" cmap: command line     | map! (IC mode)
 
-    "   }}}
-    "   Pre-Initialization ----------------------------------------------------- {{{
+"   }}}
+"   Pre-Initialization ----------------------------------------------------- {{{
 
-    " must be set before loading plugins
-    let g:python_host_prog = '/usr/bin/python'
-    let g:python_host_prog = '/usr/bin/python3'
-    let g:ruby_host_prog = '~/.rbenv/shims/neovim-ruby-host'
+" must be set before loading plugins
+let g:python_host_prog = '/usr/bin/python'
+let g:python_host_prog = '/usr/bin/python3'
+let g:ruby_host_prog = '~/.rbenv/shims/neovim-ruby-host'
 
-    "   }}}
-    "   Installed Plugins ------------------------------------------------------ {{{
+"   }}}
+"   Installed Plugins ------------------------------------------------------ {{{
 
-    " set options here, but mappings must be made outside the #begin/#end tags
-    call plug#begin('~/.nvim/plugins/')
-    Plug 'junegunn/vim-plug' " get the documentation in vim
-    Plug 'Valloric/ListToggle'
+" set options here, but mappings must be made outside the #begin/#end tags
+call plug#begin('~/.nvim/plugins/')
+Plug 'junegunn/vim-plug' " get the documentation in vim
+Plug 'Valloric/ListToggle'
 Plug 'altercation/vim-colors-solarized'
 Plug 'bkad/CamelCaseMotion'
 Plug 'mileszs/ack.vim' " {{{
@@ -84,6 +84,8 @@ Plug 'kergoth/vim-bitbake'
 Plug 'othree/xml.vim'
 
 Plug 'jiangmiao/auto-pairs'
+
+Plug 'dcharbon/vim-flatbuffers'
 
 let g:AutoPairs={'(':')', '[':']', '{':'}',"'":"'",'"':'"'}
 call plug#end() " sets: filetype plugin indent on | syntax enable
@@ -447,10 +449,10 @@ nnoremap <leader>sb  :%s:\v::gc<left><left><left><left>
 
 " H,L move to the beginning and end of the line
 " gH,gL move to the first and last non-whitespace char in the line
-noremap H 0
-noremap gH ^
-noremap L $
-noremap gL g_
+" noremap H 0
+" noremap gH ^
+" noremap L $
+" noremap gL g_
 
 " <S-k> breaks the line (opposite of <S-j>)
 nnoremap <S-k> i<cr><esc>

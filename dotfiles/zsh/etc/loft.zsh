@@ -3,6 +3,7 @@
 # https://raw.githubusercontent.com/OpenSatKit/OpenSatKit/vendor/install.sh
 insert_path $HOME/.rbenv/bin   pre
 insert_path $HOME/.rbenv/shims pre
+insert_path $HOME/tools/grmon-pro-3.0.16/linux/bin64/ post
 eval "$(rbenv init -)"
 
 # python pip installation path

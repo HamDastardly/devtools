@@ -41,32 +41,36 @@ endglobal
 # verb matches gtest (true == true, eq == eq, etc)
 # for strings, use seq or sne, case insensitive is seqc or snec
 
-snippet "(a|e)?true" "True" rb
-`!p snip.rv = make_assertion(match.group(1), None, "TRUE")`(${1:${VISUAL:true_value}});
-endsnippet
+# snippet "(a|e)?true" "True" rb
+# `!p snip.rv = make_assertion(match.group(1), None, "TRUE")`(${1:${VISUAL:true_value}});
+# endsnippet
 
-snippet "(a|e)?false" "False" rb
-`!p snip.rv = make_assertion(match.group(1), None, "FALSE")`(${1:${VISUAL:false_value}});
-endsnippet
+# snippet "(a|e)?false" "False" rb
+# `!p snip.rv = make_assertion(match.group(1), None, "FALSE")`(${1:${VISUAL:false_value}});
+# endsnippet
 
-snippet "(a|e)?(f|d)?eq" "Equal" rb
-`!p snip.rv = make_assertion(match.group(1), match.group(2), "EQ")`(${1:expected}, ${2:${VISUAL:actual}});
-endsnippet
+# snippet "(a|e)?(f|d)?eq" "Equal" rb
+# `!p snip.rv = make_assertion(match.group(1), match.group(2), "EQ")`(${1:expected}, ${2:${VISUAL:actual}});
+# endsnippet
 
-snippet "(a|e)?ne" "Not Equal" rb
-`!p snip.rv = make_assertion(match.group(1), None, "NE")`(${1:expected}, ${2:${VISUAL:actual}});
-endsnippet
+# snippet "(a|e)?ne" "Not Equal" rb
+# `!p snip.rv = make_assertion(match.group(1), None, "NE")`(${1:expected}, ${2:${VISUAL:actual}});
+# endsnippet
+
+# snippet "(a|e)?steq(c)?" "C String Equal" rb
+# `!p snip.rv = make_string_assertion(match.group(1), match.group(2), "EQ")`(${1:expected}, ${2:${VISUAL:actual}});
+# endsnippet
+
+# snippet "(a|e)?sne(c)?" "C String Equal" rb
+# `!p snip.rv = make_string_assertion(match.group(1), match.group(2), "NE")`(${1:expected}, ${2:${VISUAL:actual}});
+# endsnippet
 
 snippet "(a|e)?th" "that (hamcrest)" rb
-`!p snip.rv = make_assertion(match.group(1), None, "THAT")`(${1:${VISUAL:actual}}, ${2:matcher});
+`!p snip.rv = make_assertion(match.group(1), None, "THAT")`(${1:${VISUAL:actual}}, Eq($0));
 endsnippet
 
-snippet "(a|e)?steq(c)?" "C String Equal" rb
-`!p snip.rv = make_string_assertion(match.group(1), match.group(2), "EQ")`(${1:expected}, ${2:${VISUAL:actual}});
-endsnippet
-
-snippet "(a|e)?sne(c)?" "C String Equal" rb
-`!p snip.rv = make_string_assertion(match.group(1), match.group(2), "NE")`(${1:expected}, ${2:${VISUAL:actual}});
+snippet eq "Eq()" w
+Eq($0)
 endsnippet
 
 snippet ecall "EXPECT_CALL" b

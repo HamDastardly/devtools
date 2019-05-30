@@ -74,7 +74,7 @@ for (${1:auto} ${2:x} : ${3:y})
 endsnippet
 
 snippet for "For Loop" b
-for (${1:unsigned} ${2:ndx} = 0; $2 < ${3:limit}; ${4:++$2})
+for (${1:uint32_t} ${2:ndx} = ${3:0}; $2 < ${4:limit}; ${5:++$2})
 {
 	$0${VISUAL}
 }
@@ -104,7 +104,10 @@ snippet db "Doxygen brief" w
 endsnippet
 
 snippet dfc "Doxygen File Comment" b
-/** \file */
+/** \file
+ *
+ * \author Hamilton Little <hamilton@loftorbital.com>
+ * \date   `!v strftime("%d %b %Y")` */
 $0
 endsnippet
 

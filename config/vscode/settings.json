@@ -1,0 +1,208 @@
+{
+    "editor.rulers": [
+        80,
+        120
+    ],
+    "editor.parameterHints.enabled": false,
+    "editor.cursorSurroundingLines": 15,
+    "editor.wordWrap": "on",
+
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+
+    "workbench.statusBar.visible": true,
+    "workbench.activityBar.visible": true,
+    "workbench.editor.showTabs": true,
+    "workbench.colorTheme": "Gruvbox Dark (Medium)",
+
+    "cmake.preferredGenerators": [
+        "Unix Makefiles",
+        "Ninja",
+    ],
+    "cmake.buildDirectory": "${workspaceFolder}/build/${buildKit}",
+
+    "vim.foldfix": true,
+    "vim.camelCaseMotion.enable": true,
+    "vim.easymotion": true,
+    "vim.sneak": true,
+    "vim.sneakUseIgnorecaseAndSmartcase": true,
+    "vim.hlsearch": true,
+    "vim.visualstar": true,
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "g", "h"
+            ],
+            "after": [
+                "^",
+            ]
+        },
+        {
+            "before": [
+                "g", "l"
+            ],
+            "after": [
+                "$",
+            ]
+        },
+        {
+            "before": [
+                "g", "j"
+            ],
+            "after": [
+                "<leader>", "<leader>", "j"
+            ]
+        },
+        {
+            "before": [
+                "g", "k"
+            ],
+            "after": [
+                "<leader>", "<leader>", "k"
+            ]
+        },
+
+        {
+            "before": [
+                "*"
+            ],
+            "after": [
+                "*", "N", "z", "z"
+            ]
+        },
+        {
+            "before": [
+                "#"
+            ],
+            "after": [
+                "#", "N", "z", "z"
+            ]
+        },
+
+        {
+            "before": [
+                "<leader>", "e"
+            ],
+            "after": [
+                "A", ";", "<ESC>"
+            ]
+        },
+        {
+            "before": [
+                "<leader>", "h"
+            ],
+            "after": [
+                "g", "h"
+            ]
+        },
+        {
+            "before": [
+                "<leader>", "n"
+            ],
+            "commands": [
+                ":nohl",
+            ]
+        },
+        {
+            "before": [
+                "<leader>", "s"
+            ],
+            "commands": [
+                "editor.action.changeAll"
+            ]
+        },
+
+        {
+            "before": [
+                "K"
+            ],
+            "after": [
+                "i", "<CR>", "<ESC>"
+            ]
+        },
+        {
+            "before": [
+                "n"
+            ],
+            "after": [
+                "n", "z", "z"
+            ]
+        },
+        {
+            "before": [
+                "N"
+            ],
+            "after": [
+                "N", "z", "z"
+            ]
+        },
+    ],
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "g", "h"
+            ],
+            "after": [
+                "^",
+            ]
+        },
+        {
+            "before": [
+                "g", "l"
+            ],
+            "after": [
+                "$",
+            ]
+        },
+        {
+            "before": [
+                "g", "j"
+            ],
+            "after": [
+                "<leader>", "<leader>", "j"
+            ]
+        },
+        {
+            "before": [
+                "g", "k"
+            ],
+            "after": [
+                "<leader>", "<leader>", "k"
+            ]
+        },
+
+        {
+            "before": [
+                "*"
+            ],
+            "after": [
+                "*", "N", "z", "z"
+            ]
+        },
+        {
+            "before": [
+                "#"
+            ],
+            "after": [
+                "#", "N", "z", "z"
+            ]
+        },
+
+        {
+            "before": [
+                "<leader>", "a", "r"
+            ],
+            "commands": [
+                "align.by.regex"
+            ]
+        },
+        {
+            "before": [
+                "<leader>", "a", "l"
+            ],
+            "commands": [
+                "wwm.aligncode"
+            ]
+        },
+    ]
+}

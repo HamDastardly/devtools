@@ -1,5 +1,7 @@
 # devtools
 
+![Terminal Screenshot](screenshots/pretty_terminal_screenshot.png)
+
 ## Environment
 
 ### devtools
@@ -211,7 +213,9 @@ ranger --copy-config=all
 ```
 
 ```
-# edit $HOME/.config/ranger
+# edit $HOME/.config/ranger/rc.conf
+set preview_images true
+set preview_images_method iterm2
 ```
 
 ### GNU readlink

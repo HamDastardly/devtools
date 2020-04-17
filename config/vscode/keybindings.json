@@ -1,6 +1,15 @@
 // Place your key bindings in this file to override the defaults
 [
     {
+        "key": "shift+cmd+y",
+        "command": "-workbench.debug.action.toggleRepl"
+    },
+    {
+        "key": "shift+cmd+y",
+        "command": "workbench.action.toggleFullScreen"
+    },
+
+    {
         "key": "alt+a",
         "command": "workbench.action.debug.stepOver",
         "when": "debugState == 'stopped'"

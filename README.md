@@ -2,10 +2,6 @@
 
 ![Terminal Screenshot](screenshots/pretty_terminal_screenshot.png)
 
-## Environment
-
-### devtools
-
 ```
 cd $HOME
 mkdir -p devtools/{bin,install}
@@ -19,7 +15,7 @@ mkdir -p devtools/{bin,install}
 
 * https://rectangleapp.com/
 
-![Rectangle Keyboard Shortucts](screenshots/rectangle/rectange_keyboard_shortcuts.png)
+![Rectangle Keyboard Shortucts](screenshots/rectangle/rectangle_keyboard_shortcuts.png)
 
 ### iTerm2
 
@@ -245,9 +241,12 @@ brew install iproute2mac
 1. Set `Key Repeat` to Fast
 2. Set `Delay Until Repeat` to Short
 3. Remap `Caps Lock` to `Escape`
+4. Configure mission control and keyboard shortcuts (see images below)
 
-![Keyboard Remap Settings](screenshots/keyboard/keyboard_remap_settings.png)
 ![Keyboard Repeat Settings](screenshots/keyboard/keyboard_repeat_settings.png)
+![Keyboard Remap Settings](screenshots/keyboard/keyboard_remap_settings.png)
+![Mission Control Shortcuts](screenshots/keyboard/keyboard_mission_control.png)
+![Application Shortcuts](screenshots/keyboard/keyboard_app_shortcuts.png)
 
 ### Finder
 

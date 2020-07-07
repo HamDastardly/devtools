@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ "$(git symbolic-ref --short HEAD)" != "master" ]; then
+	echo "Not on branch 'master'!" >&2
+	echo "Did you try 'git checkout master'?" >&2
+	exit 1
+fi
+
+# fetch updates from the remote, and remove dead branches
+
+git fetch origin
+git prune origin
+
+# update master to origin/master
+# if your team allows non-ff on master, I cannot help you
+
+git pull --ff-only origin master
+git submodule update
+
+# Delete any local branches which have an upstream that was deleted, usually
+# because it was merged to master.  
+# `-d` here will not delete a branch if it would orphan an commit (not present
+# in the upstream, nor reachable by HEAD). This is why we check if the current
+# branch is master before running the script.
+
+deleted_from_remote=$(git branch -v | grep '\[gone\]' | awk '{ print $1 }')
+if [[ ! -z $deleted_from_remote ]]; then
+	git branch -d $deleted_from_remote
+fi

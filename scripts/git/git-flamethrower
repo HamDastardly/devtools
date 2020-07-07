@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Prompt the user for confirmation
+
+echo "WARNING: '$(basename $0)' is a potentially destructive operation"
+read -p 'Continue? [y],[n],[q]' choice
+case $choice in
+	[Yy] )        ;; # continue
+	*    ) exit 0 ;; # abort
+esac
+
+# start on master branch
+
+git checkout master
+
+# fetch updates from the remote, and remove dead branches
+
+git fetch
+git prune
+
+# Hard reset to origin/master. This is the risky bit.
+
+git reset --hard origin/master
+git submodule update

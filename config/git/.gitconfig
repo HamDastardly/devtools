@@ -1,0 +1,19 @@
+[user]
+	name = Hamilton Little
+	email = hamilton@loftorbital.com
+[core]
+	editor = vim
+[alias]
+	br = branch
+	ci = commit
+	co = checkout
+	cp = cherry-pick
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	ll = log --graph
+	ls = log --graph --oneline --no-decorate
+	rb = rebase
+	rbi = rebase -i
+	rst = restore
+	release-notes = log --oneline --no-decorate --no-merges
+	sb = submodule
+	st = status

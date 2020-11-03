@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+ssh -NL localhost:23750:/var/run/docker.sock picu-dev

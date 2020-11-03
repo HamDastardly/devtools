@@ -234,6 +234,23 @@ which readlink
 brew install iproute2mac
 ```
 
+### git
+
+> Add aliases to ~/.gitconfig
+
+```
+[alias]
+        co = checkout
+        ci = commit
+        st = status
+        br = branch
+        cp = cherry-pick
+        rbi = rebase -i
+        ls = log --graph --one-line --no-decorate
+        ll = log --graph
+        hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+```
+
 ## System Settings
 
 ### Keyboard

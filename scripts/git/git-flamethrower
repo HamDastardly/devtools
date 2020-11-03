@@ -17,8 +17,8 @@ git checkout master
 
 # fetch updates from the remote, and remove dead branches
 
-git fetch
-git prune
+git fetch origin
+git prune origin
 
 # Hard reset to origin/master. This is the risky bit.
 

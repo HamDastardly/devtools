@@ -159,9 +159,10 @@ function insert_path
 
 insert_path $HOME/devtools/bin pre
 
-alias ranger="source ranger" # drops into directory on 'q'
+alias rng="source ranger" # drops into directory on 'q'
+alias lgi="lazygit"
 
-# neofetch
+neofetch
 
 ################################################################################
 ```
@@ -198,6 +199,14 @@ Copy `*.json` to `$HOME/Library/ApplicationSupport/Code/User`
 | [XML Tools](https://marketplace.visualstudio.com/items?itemName=DotJoshJohnson.xml)                                    | dotjoshjohnson.xml                           |
 
 ## Packages
+
+### Lazygit
+
+> TUI git client with better tools to rewrite history
+
+```
+https://github.com/jesseduffield/lazygit/releases
+```
 
 ### ranger
 

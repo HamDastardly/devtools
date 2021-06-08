@@ -93,7 +93,16 @@ p10k configure
 | Transient Prompt | yes      |
 | Instant Prompt   | off      |
 
-> **NOTE: Install Meslo-Nerd font when prompted for full unicode character support**
+> **NOTE: Install Meslo-Nerd font when prompted for full unicode character support. But Anonymous Pro is still a better looking font IMHO**
+
+#### Context
+
+I like to enable `user@host` even when I'm on my local machine. To do so, find this line and comment it out
+
+```
+# Don't show context unless root or in SSH.
+# typeset -g POWERLEVEL9K_CONTEXT_{DEFAULT,SUDO}_CONTENT_EXPANSION=
+```
 
 #### Plugins
 

@@ -114,6 +114,7 @@ git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM}/plugins/zsh
 
 ```
 # edit ~/.zshrc
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=7"
 plugins=(
   git
   vi-mode
@@ -135,6 +136,7 @@ plugins=(
   # ssh-agent
 )
 ```
+> **NOTE: using `fg=7` (white) for the highlight color works well for dark and light color themes**
 
 > **WARNING: ssh-agent will override agent-forwarding when enabled on a remote host**
 

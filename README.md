@@ -256,19 +256,11 @@ brew install iproute2mac
 
 ### git
 
-> Add aliases to ~/.gitconfig
+> add global settings files to .gitconfig
 
 ```
-[alias]
-        co = checkout
-        ci = commit
-        st = status
-        br = branch
-        cp = cherry-pick
-        rbi = rebase -i
-        ls = log --graph --one-line --no-decorate
-        ll = log --graph
-        hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+[includes]
+	path = ${HOME}/devtools/install/devtools/dotfiles/git/gitconfig-global
 ```
 
 ## System Settings

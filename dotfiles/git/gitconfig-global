@@ -1,0 +1,12 @@
+[core]
+  excludesfile = ~/devtools/install/devtools/dotfiles/git/gitignore-global
+[alias]
+  co = checkout
+  ci = commit
+  st = status
+  br = branch
+  cp = cherry-pick
+  rbi = rebase -i
+  ls = log --graph --oneline --no-decorate
+  ll = log --graph
+

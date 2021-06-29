@@ -1,12 +1,17 @@
 [core]
-  excludesfile = ~/devtools/install/devtools/dotfiles/git/gitignore-global
+	excludesfile = ~/devtools/install/devtools/dotfiles/git/gitignore-global
+	editor = vim
 [alias]
-  co = checkout
-  ci = commit
-  st = status
-  br = branch
-  cp = cherry-pick
-  rbi = rebase -i
-  ls = log --graph --oneline --no-decorate
-  ll = log --graph
-
+	br = branch
+	ci = commit
+	co = checkout
+	cp = cherry-pick
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+	ll = log --graph
+	ls = log --graph --oneline --no-decorate
+	rb = rebase
+	rbi = rebase -i
+	release-notes = log --oneline --no-decorate --no-merges
+	rst = restore
+	sb = submodule
+	st = status

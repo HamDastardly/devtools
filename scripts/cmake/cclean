@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-if [ $(basename $(pwd)) == "build" ]; then
+if [[ $(basename $(pwd)) =~ 'build' ]]; then
 	rm -rf *
 else
 	echo "Not in a build directory!" >&2
 fi
+
